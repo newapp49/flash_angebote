@@ -29,13 +29,13 @@ class AppThemeLight extends AppTheme {
         secondary: Color(0xffE7912D), //
         onSecondary: Color(0xffffffff),
         onPrimary: Color(0xffffffff), //
-        background: Color(0xffF4F8FB), //
+        background: Color(0xffF282828), //
         onBackground: Color(0xff102E53), //
         error: Color(0xffff5656), //
         errorContainer: Color(0xFFFFA41D), //
         onError: Color(0xffffffff),
         surface: Color(0xffE6EBF3),
-        onSurface: Color(0xff596372), //
+        onSurface: Color(0xff494949), //
         tertiary: Color(0xff515BF6), //
         tertiaryContainer: Color(0xffBB79E5), //
         onTertiary: Color(0xffABB3BB), //

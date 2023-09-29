@@ -84,7 +84,7 @@ class AppThemeLight extends AppTheme {
           fontFamily: "Inter",
           fontSize: 16.sp,
           fontWeight: FontWeight.w500,
-          color: _colorSchemeLight.onBackground,
+          color: _colorSchemeLight.onPrimary,
         ),
         headlineSmall: TextStyle(
           fontFamily: "Inter",
@@ -95,8 +95,8 @@ class AppThemeLight extends AppTheme {
         labelLarge: TextStyle(
           fontFamily: "Inter",
           fontSize: 18.sp,
-          fontWeight: FontWeight.w400,
-          color: _colorSchemeLight.onBackground,
+          fontWeight: FontWeight.w600,
+          color: _colorSchemeLight.onPrimary,
         ),
         labelMedium: TextStyle(
           fontFamily: "Inter",
@@ -108,13 +108,13 @@ class AppThemeLight extends AppTheme {
           fontFamily: "Inter",
           fontSize: 12.sp,
           fontWeight: FontWeight.w400,
-          color: _colorSchemeLight.onBackground,
+          color: _colorSchemeLight.onPrimary,
         ),
         bodyLarge: TextStyle(
           fontFamily: "Inter",
           fontSize: 14.sp,
           fontWeight: FontWeight.w400,
-          color: _colorSchemeLight.onBackground,
+          color: _colorSchemeLight.onPrimary,
         ),
         bodyMedium: TextStyle(
           fontFamily: "Inter",

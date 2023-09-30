@@ -16,7 +16,7 @@ class NavigatorView extends StatefulWidget {
 
 class _NavigatorViewState extends State<NavigatorView> {
   int _activePageIndex = 0;
-  List<Widget> screenList = [HomePage()];
+  List<Widget> screenList = [const HomePage()];
   @override
   Widget build(BuildContext context) {
     return Scaffold(

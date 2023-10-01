@@ -11,6 +11,7 @@ class AppThemeLight extends AppTheme {
 
   @override
   ThemeData get theme => ThemeData(
+        fontFamily: "Inter",
         colorScheme: _colorSchemeLight,
         textTheme: _textThemeLight,
         scaffoldBackgroundColor: _colorSchemeLight.background,
@@ -29,7 +30,7 @@ class AppThemeLight extends AppTheme {
         secondary: Color(0xffE7912D), //
         onSecondary: Color(0xffffffff),
         onPrimary: Color(0xffffffff), //
-        background: Color(0xffF282828), //
+        background: Color(0xff282828), //
         onBackground: Color(0xff102E53), //
         error: Color(0xffff5656), //
         errorContainer: Color(0xFFFFA41D), //
@@ -55,81 +56,68 @@ class AppThemeLight extends AppTheme {
 
   TextTheme get _textThemeLight => TextTheme(
         displayLarge: TextStyle(
-          fontFamily: "Inter",
           fontSize: 35.sp,
           fontWeight: FontWeight.bold,
           letterSpacing: -0.5,
           color: _colorSchemeLight.onBackground,
         ),
         displayMedium: TextStyle(
-          fontFamily: "Inter",
           fontSize: 28.sp,
           fontWeight: FontWeight.w400,
           letterSpacing: -0.5,
           color: _colorSchemeLight.onBackground,
         ),
         displaySmall: TextStyle(
-          fontFamily: "Inter",
           fontSize: 24.sp,
           fontWeight: FontWeight.w400,
           color: _colorSchemeLight.onBackground,
         ),
         headlineLarge: TextStyle(
-          fontFamily: "Inter",
           fontSize: 18.sp,
           fontWeight: FontWeight.w500,
           color: _colorSchemeLight.onBackground,
         ),
         headlineMedium: TextStyle(
-          fontFamily: "Inter",
           fontSize: 16.sp,
           fontWeight: FontWeight.w500,
           color: _colorSchemeLight.onPrimary,
         ),
         headlineSmall: TextStyle(
-          fontFamily: "Inter",
           fontSize: 14.sp,
           fontWeight: FontWeight.w500,
           color: _colorSchemeLight.onBackground,
         ),
         labelLarge: TextStyle(
-          fontFamily: "Inter",
           fontSize: 18.sp,
           fontWeight: FontWeight.w600,
           color: _colorSchemeLight.onPrimary,
         ),
         labelMedium: TextStyle(
-          fontFamily: "Inter",
           fontSize: 15.sp,
           fontWeight: FontWeight.w500,
           color: _colorSchemeLight.onBackground,
         ),
         labelSmall: TextStyle(
-          fontFamily: "Inter",
           fontSize: 12.sp,
           fontWeight: FontWeight.w400,
           color: _colorSchemeLight.onPrimary,
         ),
         bodyLarge: TextStyle(
-          fontFamily: "Inter",
           fontSize: 14.sp,
           fontWeight: FontWeight.w400,
           color: _colorSchemeLight.onPrimary,
         ),
         bodyMedium: TextStyle(
-          fontFamily: "Inter",
           fontSize: 16.sp,
           fontWeight: FontWeight.w400,
           color: _colorSchemeLight.onBackground,
         ),
         titleMedium: TextStyle(
-          fontFamily: "Inter",
           fontSize: 12.sp,
           fontWeight: FontWeight.w500,
           color: _colorSchemeLight.onBackground,
         ),
         titleSmall: TextStyle(
-          fontFamily: "Inter",
           fontSize: 10.sp,
           fontWeight: FontWeight.w500,
           color: _colorSchemeLight.onBackground,

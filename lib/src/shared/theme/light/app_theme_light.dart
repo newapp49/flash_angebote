@@ -54,6 +54,7 @@ class AppThemeLight extends AppTheme {
   /* Text Theme For The App */
 
   TextTheme get _textThemeLight => TextTheme(
+    
         displayLarge: TextStyle(
           fontFamily: "Inter",
           fontSize: 35.sp,

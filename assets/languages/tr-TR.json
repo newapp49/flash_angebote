@@ -1,0 +1,14 @@
+{
+    "homepage": {
+        "title": "Flyer Angebote",
+        "recommended": "Tavsiye Edilenler",
+        "meters": "metre",
+        "km": "kilometre",
+        "days_left": "gün kaldı",
+        "bottombar": {
+            "home": "Genel",
+            "discounts": "İndirimler",
+            "activity": "Aktiviteler"
+        }
+    }
+}

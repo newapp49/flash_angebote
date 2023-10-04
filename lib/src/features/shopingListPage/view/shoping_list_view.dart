@@ -58,15 +58,15 @@ class _ShopingListPageState extends State<ShopingListPage> {
     );
   }
 
-  Center bodyPage(BuildContext context) {
-    return Center(
+  SingleChildScrollView bodyPage(BuildContext context) {
+    return SingleChildScrollView(
       child: Padding(
         padding: context.padding2,
         child: Row(
           children: [
             leftSide(context),
             SizedBox(
-              width: context.value2,
+              width: 20.w,
             ),
             rightSide(context),
           ],
@@ -77,120 +77,188 @@ class _ShopingListPageState extends State<ShopingListPage> {
 
   Expanded rightSide(BuildContext context) {
     return Expanded(
-      flex: 5,
       child: Container(
-        color: context.colorScheme.onSurface,
+        width: 215.h,
+        height: 65.h + 422.h + context.value2.h,
+        decoration: BoxDecoration(
+          color: context.colorScheme.onSurface,
+          borderRadius: BorderRadius.circular(4),
+        ),
+        child: Padding(
+          padding: context.paddingVertical2,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: context.paddingHorizontal2,
+                child: Container(
+                  height: 30.h,
+                  child: TextFormField(
+                    textAlignVertical: TextAlignVertical.bottom,
+                    style: context.textTheme.bodyLarge,
+                    cursorHeight: 14.h,
+                    decoration: InputDecoration(
+                      hintText: "Ürün aratın...",
+                      hintStyle: context.textTheme.titleMedium!
+                          .copyWith(color: context.colorScheme.onPrimary),
+                      filled: true,
+                      fillColor: context.colorScheme.background,
+                      suffixIcon: Padding(
+                        padding: context.leftPadding1,
+                        child: Icon(
+                          Icons.search,
+                          color: context.colorScheme.onPrimary,
+                        ),
+                      ),
+                      border: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.amber),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(
+                          color: context.colorScheme.onTertiary,
+                        ),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide:
+                            BorderSide(color: context.colorScheme.onTertiary),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: context.paddingHorizontal3,
+                child: Padding(
+                  padding: context.paddingVertical1,
+                  child: Text(
+                    "Eklemek/çıkarmak için dokunun",
+                    style: context.textTheme.titleMedium!
+                        .copyWith(color: context.colorScheme.onPrimary),
+                  ),
+                ),
+              ),
+              divider(context)
+            ],
+          ),
+        ),
       ),
     );
   }
 
-  Expanded leftSide(BuildContext context) {
-    return Expanded(
-      flex: 2,
-      child: Column(
-        children: [
-          Expanded(
-            flex: 7,
-            child: Container(
-              color: context.colorScheme.onSurface,
-              child: Padding(
-                padding: context.paddingHorizontal1,
-                child: Column(children: [
-                  SizedBox(
-                    width: double.maxFinite,
-                    height: 420.h,
-                    child: RawScrollbar(
-                      crossAxisMargin: -context.value2,
-                      thickness: 5,
-                      thumbVisibility: true,
-                      controller: _firstController,
-                      interactive: true,
-                      thumbColor: context.randomColor,
-                      child: ListView.builder(
-                        controller: _firstController,
-                        itemCount: 10,
-                        itemBuilder: (context, index) {
-                          if (index == 9) {
-                            return Padding(
-                              padding: context.paddingVertical1,
-                              child: Container(
-                                padding: context.padding1,
-                                width: double.maxFinite,
-                                alignment: Alignment.center,
-                                height: 70.h,
-                                decoration: BoxDecoration(
-                                    color: context.colorScheme.background,
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(4))),
-                                child: Text("+",
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 2,
-                                    textAlign: TextAlign.center,
-                                    style: context.textTheme.displayLarge!
-                                        .copyWith(
-                                            color:
-                                                context.colorScheme.onPrimary)),
-                              ),
-                            );
-                          }
-                          return Padding(
-                            padding: context.paddingVertical1,
-                            child: Container(
-                              padding: context.padding1,
-                              width: double.maxFinite,
-                              alignment: Alignment.center,
-                              height: 70.h,
-                              decoration: BoxDecoration(
-                                  color: context.colorScheme.background,
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(4))),
-                              child: Text("Alışveriş Listem 2",
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 2,
-                                  textAlign: TextAlign.center,
-                                  style: context.textTheme.labelSmall),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                ]),
-              ),
-            ),
-          ),
-          SizedBox(
-            height: context.value2,
-          ),
-          Expanded(
-            flex: 1,
-            child: Container(
-              padding: context.padding1,
-              width: double.maxFinite,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                  color: context.colorScheme.onSurface,
-                  borderRadius: BorderRadius.all(Radius.circular(4))),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.share,
-                    color: context.colorScheme.onPrimary,
-                    size: 25.h,
-                  ),
-                  Text("Paylaş",
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 2,
-                      textAlign: TextAlign.center,
-                      style: context.textTheme.labelSmall!
-                          .copyWith(color: context.colorScheme.onPrimary)),
-                ],
-              ),
-            ),
-          ),
-        ],
+  Container divider(BuildContext context) {
+    return Container(
+      padding: context.paddingHorizontal1,
+      height: 15.h,
+      child: Divider(
+        color: context.colorScheme.onTertiary,
+        thickness: 1.5.w,
       ),
+    );
+  }
+
+  Column leftSide(BuildContext context) {
+    return Column(
+      children: [
+        Container(
+          width: context.width / 4,
+          height: 422.h,
+          decoration: BoxDecoration(
+              color: context.colorScheme.onSurface,
+              borderRadius: BorderRadius.circular(4)),
+          child: Padding(
+            padding: context.paddingHorizontal1,
+            child: Column(children: [
+              SizedBox(
+                width: context.width / 4,
+                height: 420.h,
+                child: RawScrollbar(
+                  crossAxisMargin: -context.value2,
+                  thickness: 5,
+                  thumbVisibility: true,
+                  controller: _firstController,
+                  interactive: true,
+                  thumbColor: context.randomColor,
+                  child: ListView.builder(
+                    controller: _firstController,
+                    itemCount: 10,
+                    itemBuilder: (context, index) {
+                      if (index == 9) {
+                        return Padding(
+                          padding: context.paddingVertical1,
+                          child: Container(
+                            padding: context.padding1,
+                            width: double.maxFinite,
+                            alignment: Alignment.center,
+                            height: 70.h,
+                            decoration: BoxDecoration(
+                                color: context.colorScheme.background,
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(4))),
+                            child: Text("+",
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 2,
+                                textAlign: TextAlign.center,
+                                style: context.textTheme.displayLarge!.copyWith(
+                                    color: context.colorScheme.onPrimary)),
+                          ),
+                        );
+                      }
+                      return Padding(
+                        padding: context.paddingVertical1,
+                        child: Container(
+                          padding: context.padding1,
+                          width: double.maxFinite,
+                          alignment: Alignment.center,
+                          height: 70.h,
+                          decoration: BoxDecoration(
+                              color: context.colorScheme.background,
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(4))),
+                          child: Text("Alışveriş Listem 2",
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 2,
+                              textAlign: TextAlign.center,
+                              style: context.textTheme.labelSmall),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ]),
+          ),
+        ),
+        SizedBox(
+          height: context.value2,
+        ),
+        Container(
+          padding: context.padding1,
+          height: 65.h,
+          width: context.width / 4,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+              color: context.colorScheme.onSurface,
+              borderRadius: BorderRadius.all(Radius.circular(4))),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.share,
+                color: context.colorScheme.onPrimary,
+                size: 25.h,
+              ),
+              Text("Paylaş",
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 2,
+                  textAlign: TextAlign.center,
+                  style: context.textTheme.labelSmall!
+                      .copyWith(color: context.colorScheme.onPrimary)),
+            ],
+          ),
+        ),
+      ],
     );
   }
 

@@ -26,34 +26,6 @@ class _ShopingListPageState extends State<ShopingListPage> {
         child: appBar(context),
       ),
       backgroundColor: context.colorScheme.background,
-      bottomNavigationBar: SizedBox(
-        height: 66.h,
-        child: BottomNavigationBar(
-          iconSize: 18.sp,
-          selectedFontSize: 12.sp,
-          backgroundColor: context.colorScheme.background,
-          unselectedItemColor: context.colorScheme.onPrimary,
-          selectedItemColor: context.colorScheme.onPrimary,
-          items: [
-            BottomNavigationBarItem(
-              icon: const Icon(
-                Icons.home,
-              ),
-              label: LocaleKeys.homepage_bottombar_home.tr(),
-            ),
-            BottomNavigationBarItem(
-                icon: const Icon(
-                  Icons.analytics,
-                ),
-                label: LocaleKeys.homepage_bottombar_discounts.tr()),
-            BottomNavigationBarItem(
-                icon: const Icon(
-                  Icons.calendar_month_outlined,
-                ),
-                label: LocaleKeys.homepage_bottombar_activity.tr())
-          ],
-        ),
-      ),
       body: bodyPage(context),
     );
   }

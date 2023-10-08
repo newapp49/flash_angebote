@@ -5,8 +5,6 @@ import 'package:flash_angebote/src/shared/utils/extension/context_extension.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../../routing/app_router.dart';
-
 @RoutePage(name: 'ListRoute')
 class ShopingListPage extends StatefulWidget {
   const ShopingListPage({super.key});
@@ -54,26 +52,27 @@ class _ShopingListPageState extends State<ShopingListPage> {
           ],
         ),
       ),
-      body: bodyPage(context),
+      body: Center(child: bodyPage(context)),
     );
   }
 
   SingleChildScrollView bodyPage(BuildContext context) {
     return SingleChildScrollView(
+      physics: NeverScrollableScrollPhysics(),
       child: Padding(
         padding: context.padding2,
-        child: Column(
-          children: [
-            Row(
+        child: IntrinsicHeight(
+          child: Expanded(
+            child: Row(
               children: [
                 leftSide(context),
                 SizedBox(
-                  width: 20.w,
+                  width: 10.w,
                 ),
                 rightSide(context),
               ],
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -83,7 +82,7 @@ class _ShopingListPageState extends State<ShopingListPage> {
   Expanded rightSide(BuildContext context) {
     return Expanded(
       child: Container(
-        height: 65.h + 420.h + context.value2.h,
+        //height: 65.h + 420.h + context.value2.h,
         decoration: BoxDecoration(
           color: context.colorScheme.onSurface,
           borderRadius: BorderRadius.circular(4),
@@ -98,7 +97,6 @@ class _ShopingListPageState extends State<ShopingListPage> {
               searchBarOpenStateTopContainer(context),
               Visibility(visible: !sizeBool, child: divider(context)),
               shopListContainer(context),
-              Spacer(),
               bottomSearchField(context),
             ],
           ),
@@ -125,7 +123,8 @@ class _ShopingListPageState extends State<ShopingListPage> {
               style: context.textTheme.bodyLarge,
               cursorHeight: 14.h,
               decoration: InputDecoration(
-                hintText: "Ne almak istiyorsunuz?",
+                hintText:
+                    "${LocaleKeys.shopping_list_page_what_do_you_whant.tr()}",
                 hintStyle: context.textTheme.titleMedium!
                     .copyWith(color: context.colorScheme.onPrimary),
                 filled: true,
@@ -168,7 +167,7 @@ class _ShopingListPageState extends State<ShopingListPage> {
           style: context.textTheme.bodyLarge,
           cursorHeight: 14.h,
           decoration: InputDecoration(
-            hintText: "Ürün aratın...",
+            hintText: "${LocaleKeys.shopping_list_page_search_item.tr()}",
             hintStyle: context.textTheme.titleMedium!
                 .copyWith(color: context.colorScheme.onPrimary),
             filled: true,
@@ -211,7 +210,7 @@ class _ShopingListPageState extends State<ShopingListPage> {
           },
           child: Container(
             width: double.maxFinite,
-            height: sizeBool == true ? context.height - 341 : 210,
+            height: sizeBool == true ? context.height - 275.h : 200.h,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -224,6 +223,8 @@ class _ShopingListPageState extends State<ShopingListPage> {
                   child: Container(
                     child: ListView(children: [
                       itemWithImage(context, false),
+                      itemWithoutImage(context),
+                      itemWithoutImage(context),
                       itemWithoutImage(context),
                     ]),
                   ),
@@ -243,14 +244,15 @@ class _ShopingListPageState extends State<ShopingListPage> {
           padding: context.paddingHorizontal2,
           child: Container(
             width: double.maxFinite,
-            height: context.height - 604.20 - 6 + context.value1 + 40,
+            height: context.height - 485.h,
+            //height: context.height - 604.20 - 6 + context.value1 + 35,
             child: Container(
               width: double.maxFinite,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Sık kullanılan",
+                    "${LocaleKeys.shopping_list_page_most_used.tr()}",
                     style: context.textTheme.titleMedium!
                         .copyWith(color: context.colorScheme.onPrimary),
                   ),
@@ -452,39 +454,40 @@ class _ShopingListPageState extends State<ShopingListPage> {
   Column leftSide(BuildContext context) {
     return Column(
       children: [
-        Container(
-          width: context.width / 5,
-          height: 421.h,
-          decoration: BoxDecoration(
-              color: context.colorScheme.onSurface,
-              borderRadius: BorderRadius.circular(4)),
-          child: Padding(
-            padding: context.paddingHorizontal1,
-            child: Column(children: [
-              Container(
-                width: context.width / 5,
-                height: 420.h,
-                child: RawScrollbar(
-                  crossAxisMargin: -context.value2,
-                  thickness: 5,
-                  thumbVisibility: true,
-                  controller: _firstController,
-                  interactive: true,
-                  thumbColor: context.colorScheme.onTertiary,
-                  radius: Radius.circular(4),
-                  child: ListView.builder(
+        Expanded(
+          child: Container(
+            width: 80.w,
+            decoration: BoxDecoration(
+                color: context.colorScheme.onSurface,
+                borderRadius: BorderRadius.circular(4)),
+            child: Padding(
+              padding: context.paddingHorizontal1,
+              child: Column(children: [
+                Container(
+                  width: 80.w,
+                  height: 420.h,
+                  child: RawScrollbar(
+                    crossAxisMargin: -context.value2,
+                    thickness: 5,
+                    thumbVisibility: true,
                     controller: _firstController,
-                    itemCount: 5,
-                    itemBuilder: (context, index) {
-                      if (index == 4) {
-                        return addShopListContainer(context);
-                      }
-                      return shopListNameContainer(context);
-                    },
+                    interactive: true,
+                    thumbColor: context.colorScheme.onTertiary,
+                    radius: Radius.circular(4),
+                    child: ListView.builder(
+                      controller: _firstController,
+                      itemCount: 10,
+                      itemBuilder: (context, index) {
+                        if (index == 9) {
+                          return addShopListContainer(context);
+                        }
+                        return shopListNameContainer(context);
+                      },
+                    ),
                   ),
                 ),
-              ),
-            ]),
+              ]),
+            ),
           ),
         ),
         SizedBox(
@@ -539,8 +542,8 @@ class _ShopingListPageState extends State<ShopingListPage> {
   Container shareButton(BuildContext context) {
     return Container(
       padding: context.padding1,
-      height: 64.h,
-      width: context.width / 5,
+      height: 80.h,
+      width: 80.w,
       alignment: Alignment.center,
       decoration: BoxDecoration(
           color: context.colorScheme.inversePrimary.withOpacity(0.5),

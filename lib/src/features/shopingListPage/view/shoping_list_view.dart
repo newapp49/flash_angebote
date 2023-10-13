@@ -1,8 +1,12 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flash_angebote/core/init/lang/locale_keys.g.dart';
+import 'package:flash_angebote/src/features/shopingListPage/sqlite/repo.dart';
+import 'package:flash_angebote/src/features/shopingListPage/view_model/shopping_list_cubit.dart';
+import 'package:flash_angebote/src/features/shopingListPage/view_model/shopping_list_state.dart';
 import 'package:flash_angebote/src/shared/utils/extension/context_extension.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 @RoutePage(name: 'ListRoute')
@@ -15,7 +19,15 @@ class ShopingListPage extends StatefulWidget {
 
 class _ShopingListPageState extends State<ShopingListPage> {
   final ScrollController _firstController = ScrollController();
+  late List<String> shopLista;
   bool sizeBool = true;
+
+  @override
+  void initState() {
+    shopLista = <String>[];
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -52,11 +64,11 @@ class _ShopingListPageState extends State<ShopingListPage> {
           ],
         ),
       ),
-      body: Center(child: bodyPage(context)),
+      body: Center(child: bodyPage(context, shopLista)),
     );
   }
 
-  SingleChildScrollView bodyPage(BuildContext context) {
+  SingleChildScrollView bodyPage(BuildContext context, List<String> shopList) {
     return SingleChildScrollView(
       physics: NeverScrollableScrollPhysics(),
       child: Padding(
@@ -65,7 +77,7 @@ class _ShopingListPageState extends State<ShopingListPage> {
           child: Expanded(
             child: Row(
               children: [
-                leftSide(context),
+                leftSide(context, shopList),
                 SizedBox(
                   width: 10.w,
                 ),
@@ -82,7 +94,6 @@ class _ShopingListPageState extends State<ShopingListPage> {
   Expanded rightSide(BuildContext context) {
     return Expanded(
       child: Container(
-        //height: 65.h + 420.h + context.value2.h,
         decoration: BoxDecoration(
           color: context.colorScheme.onSurface,
           borderRadius: BorderRadius.circular(4),
@@ -451,7 +462,7 @@ class _ShopingListPageState extends State<ShopingListPage> {
   }
 
   //Left Side Component
-  Column leftSide(BuildContext context) {
+  Column leftSide(BuildContext context, List<String> shopList) {
     return Column(
       children: [
         Expanded(
@@ -474,14 +485,30 @@ class _ShopingListPageState extends State<ShopingListPage> {
                     interactive: true,
                     thumbColor: context.colorScheme.onTertiary,
                     radius: Radius.circular(4),
-                    child: ListView.builder(
-                      controller: _firstController,
-                      itemCount: 10,
-                      itemBuilder: (context, index) {
-                        if (index == 9) {
-                          return addShopListContainer(context);
-                        }
-                        return shopListNameContainer(context);
+                    child: BlocBuilder<ShoppingListAddCubit,
+                        ShoppingListChangeEvent>(
+                      builder: (BuildContext context,
+                          ShoppingListChangeEvent state) {
+                        return ListView.builder(
+                          controller: _firstController,
+                          itemCount:
+                              state.shopList.length + 1, //shopList.length + 1,
+                          itemBuilder: (context, index) {
+                            if (index == state.shopList.length ||
+                                state.shopList.isEmpty) {
+                              return GestureDetector(
+                                  onTap: () {
+                                    print(state.shopList.length);
+                                    BlocProvider.of<ShoppingListAddCubit>(
+                                            context)
+                                        .addShoppingList("new $index");
+                                  },
+                                  child: addShopListContainer(context));
+                            }
+                            return shopListNameContainer(
+                                context, state.shopList[index]);
+                          },
+                        );
                       },
                     ),
                   ),
@@ -519,7 +546,7 @@ class _ShopingListPageState extends State<ShopingListPage> {
     );
   }
 
-  Padding shopListNameContainer(BuildContext context) {
+  Padding shopListNameContainer(BuildContext context, String name) {
     return Padding(
       padding: context.topPadding1,
       child: Container(
@@ -530,7 +557,7 @@ class _ShopingListPageState extends State<ShopingListPage> {
         decoration: BoxDecoration(
             color: context.colorScheme.background,
             borderRadius: BorderRadius.all(Radius.circular(4))),
-        child: Text("Alışveriş Listem 2",
+        child: Text(name,
             overflow: TextOverflow.ellipsis,
             maxLines: 2,
             textAlign: TextAlign.center,

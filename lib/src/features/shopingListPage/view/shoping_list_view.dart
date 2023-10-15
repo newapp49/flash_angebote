@@ -5,8 +5,6 @@ import 'package:flash_angebote/src/shared/utils/extension/context_extension.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../../routing/app_router.dart';
-
 @RoutePage(name: 'ListRoute')
 class ShopingListPage extends StatefulWidget {
   const ShopingListPage({super.key});

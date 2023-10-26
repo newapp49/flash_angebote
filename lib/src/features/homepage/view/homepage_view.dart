@@ -1,15 +1,32 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flash_angebote/src/features/homepage/view_model/homepage_cubit.dart';
+import 'package:flash_angebote/src/features/homepage/view_model/homepage_state.dart';
 import 'package:flash_angebote/src/routing/app_router.dart';
 import 'package:flash_angebote/src/shared/utils/extension/context_extension.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/init/lang/locale_keys.g.dart';
 
 @RoutePage(name: 'HomeRoute')
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  late HomePageCubit _cubit;
+
+  @override
+  void initState() {
+    _cubit = BlocProvider.of<HomePageCubit>(context);
+    _cubit.getData();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +36,22 @@ class HomePage extends StatelessWidget {
         child: appBar(context),
       ),
       backgroundColor: context.colorScheme.background,
-      body: pageBody(context),
+      body: BlocBuilder<HomePageCubit, HomePageState>(
+        builder: (BuildContext context, state) {
+          if (state is HomePageInitial) {
+            return pageBody(context);
+          } else if (state is HomePageLoading) {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          } else if (state is HomePageComplete) {
+            return pageBody(context);
+          } else {
+            final error = state is HomePageError;
+            return Text(error.toString());
+          }
+        },
+      ),
     );
   }
 

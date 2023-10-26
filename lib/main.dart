@@ -1,6 +1,11 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flash_angebote/src/features/homepage/view_model/homepage_cubit.dart';
+import 'package:flash_angebote/src/features/shopingListPage/model/list_model.dart';
+import 'package:flash_angebote/src/features/shopingListPage/sqlite/repo.dart';
+import 'package:flash_angebote/src/features/shopingListPage/view_model/shopping_list_cubit.dart';
 import 'package:flash_angebote/src/shared/theme/provider/application_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
@@ -23,7 +28,21 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      providers: [...ApplicationProvider.instance.dependItems],
+      providers: [
+        ...ApplicationProvider.instance.dependItems,
+        BlocProvider(
+          create: (context) => HomePageCubit(),
+        ),
+        BlocProvider(
+          create: (context) => ShoppingListCubit(),
+        ),
+        BlocProvider(
+          create: (context) => ShoppingListAddCubit(Repo()),
+        ),
+        BlocProvider(
+          create: (context) => ShoppingListViewCubit(),
+        ),
+      ],
       child: EasyLocalization(
         supportedLocales: LanguageManager.instance.supportedLocales,
         path: ApplicationConstants.LANG_ASSET_PATH,

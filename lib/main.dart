@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flash_angebote/src/features/homepage/view_model/homepage_cubit.dart';
+import 'package:flash_angebote/src/features/shopingListPage/model/list_model.dart';
 import 'package:flash_angebote/src/features/shopingListPage/sqlite/repo.dart';
 import 'package:flash_angebote/src/features/shopingListPage/view_model/shopping_list_cubit.dart';
 import 'package:flash_angebote/src/shared/theme/provider/application_provider.dart';
@@ -37,6 +38,9 @@ class MainApp extends StatelessWidget {
         ),
         BlocProvider(
           create: (context) => ShoppingListAddCubit(Repo()),
+        ),
+        BlocProvider(
+          create: (context) => ShoppingListViewCubit(),
         ),
       ],
       child: EasyLocalization(

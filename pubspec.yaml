@@ -16,6 +16,9 @@ dependencies:
     sdk: flutter
   flutter_screenutil: ^5.9.0
   provider: ^6.0.5
+  path_provider: ^2.1.1
+
+  pdf: ^3.10.4
 
 dev_dependencies:
   flutter_test:
@@ -27,4 +30,4 @@ flutter:
   assets:
     - assets/languages/
     - assets/images/
-    - assets/fonts/
+    - assets/fonts/Roboto-Regular.ttf

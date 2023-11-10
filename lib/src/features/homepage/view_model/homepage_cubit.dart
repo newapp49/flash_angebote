@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flash_angebote/src/features/homepage/view_model/homepage_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:location/location.dart';
@@ -34,13 +35,11 @@ class HomePageCubit extends Cubit<HomePageState> {
     inspect(_locationData);
   }
 
-  Future<void> getData() async {
-    try {
-      emit(HomePageLoading());
-      await Future.delayed(Duration(seconds: 5));
-      emit(HomePageComplete());
-    } catch (e) {
-      emit(HomePageError(e.toString()));
-    }
+  Future<void> init() async {
+    emit(const HomePageLoading());
+
+    final fcmToken = await FirebaseMessaging.instance.getToken();
+    print(fcmToken);
+    emit(const HomePageComplete());
   }
 }

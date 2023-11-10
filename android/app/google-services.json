@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "926172492269",
+    "project_id": "flyer-angebote",
+    "storage_bucket": "flyer-angebote.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:926172492269:android:956a8a3ae120c333cdb7e4",
+        "android_client_info": {
+          "package_name": "com.example.flash_angebote"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAOfH1pnLp88T0dJHYLAOb-5n9E-l9ioGI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:926172492269:android:74e12683843fcc8ccdb7e4",
+        "android_client_info": {
+          "package_name": "com.example.flash_flyer"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAOfH1pnLp88T0dJHYLAOb-5n9E-l9ioGI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

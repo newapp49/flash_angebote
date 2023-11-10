@@ -24,7 +24,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     _cubit = BlocProvider.of<HomePageCubit>(context);
-    _cubit.getData();
+    _cubit.init();
     _cubit.getLocation();
     super.initState();
   }

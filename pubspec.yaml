@@ -23,6 +23,9 @@ dependencies:
   json_serializable: ^6.7.1
   json_annotation: ^4.8.1
   geolocator: ^10.1.0
+  path_provider: ^2.1.1
+
+  pdf: ^3.10.4
 
 dev_dependencies:
   flutter_test:
@@ -34,4 +37,4 @@ flutter:
   assets:
     - assets/languages/
     - assets/images/
-    - assets/fonts/
+    - assets/fonts/Roboto-Regular.ttf

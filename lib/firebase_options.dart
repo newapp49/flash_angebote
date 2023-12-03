@@ -54,6 +54,7 @@ class DefaultFirebaseOptions {
     appId: '1:926172492269:android:956a8a3ae120c333cdb7e4',
     messagingSenderId: '926172492269',
     projectId: 'flyer-angebote',
+    databaseURL: 'https://flyer-angebote-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'flyer-angebote.appspot.com',
   );
 
@@ -62,6 +63,7 @@ class DefaultFirebaseOptions {
     appId: '1:926172492269:ios:445a70898aa96c53cdb7e4',
     messagingSenderId: '926172492269',
     projectId: 'flyer-angebote',
+    databaseURL: 'https://flyer-angebote-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'flyer-angebote.appspot.com',
     iosBundleId: 'com.example.flashAngebote',
   );

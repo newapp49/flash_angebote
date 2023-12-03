@@ -19,11 +19,15 @@ dependencies:
   location: ^5.0.3
   firebase_core: ^2.20.0
   firebase_messaging: ^14.7.2
+  firebase_database: ^10.3.4
+  json_serializable: ^6.7.1
+  json_annotation: ^4.8.1
+  geolocator: ^10.1.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^2.0.0
+  flutter_lints: ^3.0.1
 
 flutter:
   uses-material-design: true

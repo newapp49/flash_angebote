@@ -18,6 +18,7 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 @RoutePage(name: 'ListRoute')
 class ShopingListPage extends StatefulWidget {
@@ -832,9 +833,9 @@ class _ShopingListPageState extends State<ShopingListPage> {
             ),
           );
 
-          final directory = await getExternalStorageDirectory();
+          final directory = await getTemporaryDirectory();
 
-          final directoryPath = "${directory?.path}/Flash Angebote";
+          final directoryPath = "${directory.path}/Flash Angebote";
 
           if (!await Directory(directoryPath).exists()) {
             await Directory(directoryPath).create(recursive: true);
@@ -844,6 +845,14 @@ class _ShopingListPageState extends State<ShopingListPage> {
           await file.writeAsBytes(await pdf.save());
 
           print("PDF dosyası cihaza kaydedildi: ${file.path}");
+
+          final result = await Share.shareXFiles(
+              [XFile('${directoryPath}/MyPdf.pdf')],
+              );
+
+          if (result.status == ShareResultStatus.success) {
+            print('Send');
+          }
         },
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

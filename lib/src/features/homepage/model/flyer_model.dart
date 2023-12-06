@@ -7,8 +7,15 @@ class FlyerModel {
   int? companyId;
   int? pageCount;
   String? picture;
+  String? expireDate;
+  List<String?>? flyerUrls;
 
-  FlyerModel({this.companyId, this.pageCount, this.picture});
+  FlyerModel(
+      {this.companyId,
+      this.pageCount,
+      this.picture,
+      this.expireDate,
+      this.flyerUrls});
 
   FlyerModel fromJson(Map<String, dynamic> json) {
     return _$FlyerModelFromJson(json);

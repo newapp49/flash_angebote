@@ -12,13 +12,35 @@ class HomePageCubit extends Cubit<HomePageState> {
   HomePageCubit() : super(const HomePageInitial());
   CollectionReference companyDB =
       FirebaseFirestore.instance.collection('flash_angebote_companies');
+  CollectionReference flyerDB =
+      FirebaseFirestore.instance.collection('flash_angebote_flyers');
 
   List<CompanyModel?>? companyList = [];
   List<FlyerModel?>? flyerList = [];
 
   late Position locationData;
 
-  Future<void> readCompanyData() async {}
+  Future<void> readCompanyData() async {
+    await companyDB.get().then((value) {
+      print("Successfully completed");
+      for (var docSnapshot in value.docs) {
+        companyList!.add(
+            CompanyModel.fromJson(docSnapshot.data() as Map<String, dynamic>));
+      }
+    });
+    inspect(companyList);
+  }
+
+  Future<void> readFlyerData() async {
+    await flyerDB.get().then((value) {
+      print("Successfully completed");
+      for (var docSnapshot in value.docs) {
+        flyerList!.add(
+            FlyerModel.fromJson(docSnapshot.data() as Map<String, dynamic>));
+      }
+    });
+    inspect(flyerList);
+  }
 
   Future<Position> _determinePosition() async {
     bool serviceEnabled;
@@ -51,8 +73,10 @@ class HomePageCubit extends Cubit<HomePageState> {
     emit(const HomePageLoading());
     //final fcmToken = await FirebaseMessaging.instance.getToken();
     locationData = await _determinePosition();
-    inspect(locationData);
-    inspect(companyDB);
+    await readCompanyData();
+    await readFlyerData();
+    // inspect(locationData);
+    // inspect(companyDB);
     emit(const HomePageComplete());
   }
 }

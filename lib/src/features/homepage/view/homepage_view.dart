@@ -27,12 +27,6 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     _cubit = BlocProvider.of<HomePageCubit>(context);
     _cubit.init();
-    // if (Platform.isAndroid) {
-    //   _cubit.getLocation();
-    //   _cubit.readCompanyData();
-    // } else {
-    //   _cubit.getLocation();
-    // }
 
     super.initState();
   }

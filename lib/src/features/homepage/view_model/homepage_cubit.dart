@@ -1,8 +1,7 @@
 import 'dart:developer';
 
-import 'package:firebase_database/firebase_database.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flash_angebote/src/features/homepage/model/app_model.dart';
 import 'package:flash_angebote/src/features/homepage/model/company_model.dart';
 import 'package:flash_angebote/src/features/homepage/model/flyer_model.dart';
 import 'package:flash_angebote/src/features/homepage/view_model/homepage_state.dart';
@@ -11,16 +10,15 @@ import 'package:geolocator/geolocator.dart';
 
 class HomePageCubit extends Cubit<HomePageState> {
   HomePageCubit() : super(const HomePageInitial());
-  DatabaseReference dbReference = FirebaseDatabase.instance.ref('company');
+  CollectionReference companyDB =
+      FirebaseFirestore.instance.collection('flash_angebote_companies');
+
   List<CompanyModel?>? companyList = [];
   List<FlyerModel?>? flyerList = [];
 
-  Future<void> readCompanyData() async {
-    DataSnapshot? response = await dbReference.root.get();
-    response.value as ApplicationModel;
-    final value = ApplicationModel.fromJson(
-        Map<String, dynamic>.from(response.value! as Map<Object?, Object?>));
-  }
+  late Position locationData;
+
+  Future<void> readCompanyData() async {}
 
   Future<Position> _determinePosition() async {
     bool serviceEnabled;
@@ -51,9 +49,10 @@ class HomePageCubit extends Cubit<HomePageState> {
 
   Future<void> init() async {
     emit(const HomePageLoading());
-    final fcmToken = await FirebaseMessaging.instance.getToken();
-    Position position = await _determinePosition();
-    inspect(position);
+    //final fcmToken = await FirebaseMessaging.instance.getToken();
+    locationData = await _determinePosition();
+    inspect(locationData);
+    inspect(companyDB);
     emit(const HomePageComplete());
   }
 }

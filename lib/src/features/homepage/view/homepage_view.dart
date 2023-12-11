@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flash_angebote/src/features/homepage/view_model/homepage_cubit.dart';
@@ -24,7 +26,14 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     _cubit = BlocProvider.of<HomePageCubit>(context);
-    _cubit.getData();
+    _cubit.init();
+    // if (Platform.isAndroid) {
+    //   _cubit.getLocation();
+    //   _cubit.readCompanyData();
+    // } else {
+    //   _cubit.getLocation();
+    // }
+
     super.initState();
   }
 

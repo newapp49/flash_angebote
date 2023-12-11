@@ -1,7 +1,6 @@
-import 'dart:io';
-
 import 'package:auto_route/auto_route.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flash_angebote/src/features/homepage/model/flyer_model.dart';
 import 'package:flash_angebote/src/features/homepage/view_model/homepage_cubit.dart';
 import 'package:flash_angebote/src/features/homepage/view_model/homepage_state.dart';
 import 'package:flash_angebote/src/routing/app_router.dart';
@@ -44,7 +43,7 @@ class _HomePageState extends State<HomePage> {
           if (state is HomePageInitial) {
             return pageBody(context);
           } else if (state is HomePageLoading) {
-            return Center(
+            return const Center(
               child: CircularProgressIndicator(),
             );
           } else if (state is HomePageComplete) {
@@ -64,67 +63,115 @@ class _HomePageState extends State<HomePage> {
         children: [
           billboardCards(),
           SizedBox(height: 5.h),
-          buildPageIndicators(),
+          buildPageIndicators(4),
           SizedBox(height: 5.h),
           recommendedText(context),
           SizedBox(height: 3.h),
           recommendedFlyerCards(context),
           divider(context),
-          closeMarketFlyers()
+          closeMarketFlyers(_cubit, context)
         ],
       ),
     );
   }
 
-  GridView closeMarketFlyers() {
+  GridView closeMarketFlyers(HomePageCubit cubit, BuildContext context) {
     return GridView.builder(
       physics: const NeverScrollableScrollPhysics(),
-      itemCount: 10,
+      itemCount: cubit.flyerList!.length,
       scrollDirection: Axis.vertical,
       shrinkWrap: true,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           childAspectRatio: 0.65.w, crossAxisCount: 2),
       itemBuilder: (context, index) {
-        return Padding(
-          padding: context.paddingHorizontal2,
-          child: Container(
-            margin: context.paddingVertical1,
-            decoration: BoxDecoration(
-                color: context.colorScheme.onSurface,
-                borderRadius: BorderRadius.circular(5.w)),
-            child: Padding(
-              padding: EdgeInsets.all(2.w),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(
-                      height: 20.h,
+        return GestureDetector(
+          onTap: () {
+            FlyerModel? selectedFlyer = cubit.flyerList![index];
+            showDialog(
+              context: context,
+              builder: (context) => Dialog(
+                child: Container(
+                  color: context.colorScheme.background,
+                  width: context.width,
+                  height: 465.w,
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        width: context.width,
+                        height: 450.w,
+                        child: PageView.builder(
+                          itemCount: selectedFlyer!.pageCount!,
+                          itemBuilder: (context, index) => Container(
+                            height: 450.w,
+                            width: context.width,
+                            decoration: BoxDecoration(
+                              image: DecorationImage(
+                                  image: NetworkImage(
+                                    selectedFlyer.flyerUrls![index]!,
+                                  ),
+                                  fit: BoxFit.cover),
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 2.w,
+                      ),
+                      buildPageIndicators(selectedFlyer.pageCount!)
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+          child: Padding(
+            padding: context.paddingHorizontal2,
+            child: Container(
+              margin: context.paddingVertical1,
+              decoration: BoxDecoration(
+                  color: context.colorScheme.onSurface,
+                  borderRadius: BorderRadius.circular(5.w)),
+              child: Padding(
+                padding: EdgeInsets.all(2.w),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                        margin: context.paddingHorizontal1,
+                        height: 20.h,
+                        child: Text(
+                          cubit.companyList![index]!.companyName!,
+                          style: context.textTheme.headlineMedium!
+                              .copyWith(fontWeight: FontWeight.bold),
+                        )),
+                    Container(
+                      width: 150.w,
+                      height: 135.h,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                            image: NetworkImage(
+                                cubit.flyerList![index]!.flyerUrls![0]!),
+                            fit: BoxFit.fitWidth),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 15.h,
                       child: Text(
-                        "A101",
-                        style: context.textTheme.headlineMedium,
-                      )),
-                  Container(
-                    width: 150.w,
-                    height: 135.h,
-                    color: context.randomColor,
-                  ),
-                  SizedBox(
-                    height: 15.h,
-                    child: Text(
-                      "4 ${LocaleKeys.homepage_days_left.tr()}",
-                      style: context.textTheme.labelSmall!
-                          .copyWith(letterSpacing: 0),
+                        "4 ${LocaleKeys.homepage_days_left.tr()}",
+                        style: context.textTheme.labelSmall!
+                            .copyWith(letterSpacing: 0),
+                      ),
                     ),
-                  ),
-                  SizedBox(
-                    height: 15.h,
-                    child: Text(
-                      "1.2 ${LocaleKeys.homepage_km.tr()}",
-                      style: context.textTheme.labelSmall!
-                          .copyWith(letterSpacing: 0),
-                    ),
-                  )
-                ],
+                    SizedBox(
+                      height: 15.h,
+                      child: Text(
+                        "${cubit.locationList.values.toList()[index].toInt()} ${LocaleKeys.homepage_km.tr()}",
+                        style: context.textTheme.labelSmall!
+                            .copyWith(letterSpacing: 0),
+                      ),
+                    )
+                  ],
+                ),
               ),
             ),
           ),
@@ -144,140 +191,63 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Row recommendedFlyerCards(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        Container(
-          width: 100.w,
-          height: 150.h,
+  Widget recommendedFlyerCards(BuildContext context) {
+    return Container(
+      padding: context.paddingHorizontal2,
+      width: context.width,
+      height: 120.h,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        padding: EdgeInsets.zero,
+        itemCount: 3,
+        shrinkWrap: true,
+        itemBuilder: (context, index) => Container(
+          margin: index == 1 ? context.paddingHorizontal2 : EdgeInsets.zero,
+          width: 99.w,
           decoration: BoxDecoration(
               color: context.colorScheme.onSurface,
               borderRadius: BorderRadius.circular(5.w)),
-          child: Padding(
-            padding: EdgeInsets.all(2.w),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(
-                    height: 20.h,
-                    child: Text(
-                      "A101",
-                      style: context.textTheme.headlineMedium,
-                    )),
-                Container(
-                  width: 100.w,
-                  height: 95.h,
-                  color: context.randomColor,
-                ),
-                const Spacer(),
-                SizedBox(
-                  height: 15.h,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                  alignment: Alignment.center,
+                  height: 20.h,
                   child: Text(
-                    "4 ${LocaleKeys.homepage_days_left.tr()}",
-                    style: context.textTheme.labelSmall!
-                        .copyWith(letterSpacing: 0),
-                  ),
-                ),
-                SizedBox(
-                  height: 15.h,
-                  child: Text(
-                    "1.2 ${LocaleKeys.homepage_km.tr()}",
-                    style: context.textTheme.labelSmall!
-                        .copyWith(letterSpacing: 0),
-                  ),
-                )
-              ],
-            ),
+                    _cubit.companyList![index]!.companyName!,
+                    style: context.textTheme.headlineMedium!
+                        .copyWith(fontSize: 12.sp, fontWeight: FontWeight.bold),
+                  )),
+              Container(
+                width: 100.w,
+                height: 95.h,
+                decoration: BoxDecoration(
+                    image: DecorationImage(
+                        image: NetworkImage(
+                            _cubit.companyList![index]!.companyLogo!),
+                        fit: BoxFit.cover)),
+              ),
+              // const Spacer(),
+              // SizedBox(
+              //   height: 15.h,
+              //   child: Text(
+              //     "4 ${LocaleKeys.homepage_days_left.tr()}",
+              //     style: context.textTheme.labelSmall!
+              //         .copyWith(letterSpacing: 0),
+              //   ),
+              // ),
+              // SizedBox(
+              //   height: 15.h,
+              //   child: Text(
+              //     "1.2 ${LocaleKeys.homepage_km.tr()}",
+              //     style: context.textTheme.labelSmall!
+              //         .copyWith(letterSpacing: 0),
+              //   ),
+              // )
+            ],
           ),
         ),
-        Container(
-          width: 100.w,
-          height: 150.h,
-          decoration: BoxDecoration(
-              color: context.colorScheme.onSurface,
-              borderRadius: BorderRadius.circular(5.w)),
-          child: Padding(
-            padding: EdgeInsets.all(2.w),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(
-                    height: 20.h,
-                    child: Text(
-                      "A101",
-                      style: context.textTheme.headlineMedium,
-                    )),
-                Container(
-                  width: 100.w,
-                  height: 95.h,
-                  color: context.randomColor,
-                ),
-                const Spacer(),
-                SizedBox(
-                  height: 15.h,
-                  child: Text(
-                    "4 ${LocaleKeys.homepage_days_left.tr()}",
-                    style: context.textTheme.labelSmall!
-                        .copyWith(letterSpacing: 0),
-                  ),
-                ),
-                SizedBox(
-                  height: 15.h,
-                  child: Text(
-                    "1.2 ${LocaleKeys.homepage_km.tr()}",
-                    style: context.textTheme.labelSmall!
-                        .copyWith(letterSpacing: 0),
-                  ),
-                )
-              ],
-            ),
-          ),
-        ),
-        Container(
-          width: 100.w,
-          height: 150.h,
-          decoration: BoxDecoration(
-              color: context.colorScheme.onSurface,
-              borderRadius: BorderRadius.circular(5.w)),
-          child: Padding(
-            padding: EdgeInsets.all(2.w),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(
-                    height: 20.h,
-                    child: Text(
-                      "A101",
-                      style: context.textTheme.headlineMedium,
-                    )),
-                Container(
-                  width: 100.w,
-                  height: 95.h,
-                  color: context.randomColor,
-                ),
-                const Spacer(),
-                SizedBox(
-                  height: 15.h,
-                  child: Text(
-                    "4 ${LocaleKeys.homepage_days_left.tr()}",
-                    style: context.textTheme.labelSmall!
-                        .copyWith(letterSpacing: 0),
-                  ),
-                ),
-                SizedBox(
-                  height: 15.h,
-                  child: Text(
-                    "1.2 ${LocaleKeys.homepage_km.tr()}",
-                    style: context.textTheme.labelSmall!
-                        .copyWith(letterSpacing: 0),
-                  ),
-                )
-              ],
-            ),
-          ),
-        ),
-      ],
+      ),
     );
   }
 
@@ -292,7 +262,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  SizedBox buildPageIndicators() {
+  SizedBox buildPageIndicators(int itemCount) {
     return SizedBox(
       height: 5.h,
       child: Row(
@@ -301,7 +271,7 @@ class _HomePageState extends State<HomePage> {
           ListView.builder(
             padding: EdgeInsets.zero,
             shrinkWrap: true,
-            itemCount: 4,
+            itemCount: itemCount,
             scrollDirection: Axis.horizontal,
             itemBuilder: (context, index) {
               return Padding(

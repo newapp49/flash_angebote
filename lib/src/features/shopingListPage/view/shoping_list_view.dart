@@ -832,18 +832,20 @@ class _ShopingListPageState extends State<ShopingListPage> {
             ),
           );
 
-          final directory = await getExternalStorageDirectory();
+          if (Platform.isAndroid) {
+            final directory = await getExternalStorageDirectory();
 
-          final directoryPath = "${directory?.path}/Flash Angebote";
+            final directoryPath = "${directory?.path}/Flash Angebote";
 
-          if (!await Directory(directoryPath).exists()) {
-            await Directory(directoryPath).create(recursive: true);
+            if (!await Directory(directoryPath).exists()) {
+              await Directory(directoryPath).create(recursive: true);
+            }
+
+            final file = File("${directoryPath}/MyPdf.pdf");
+            await file.writeAsBytes(await pdf.save());
+
+            print("PDF dosyası cihaza kaydedildi: ${file.path}");
           }
-
-          final file = File("${directoryPath}/MyPdf.pdf");
-          await file.writeAsBytes(await pdf.save());
-
-          print("PDF dosyası cihaza kaydedildi: ${file.path}");
         },
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

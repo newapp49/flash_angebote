@@ -4,6 +4,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flash_angebote/src/features/homepage/view_model/homepage_cubit.dart';
+import 'package:flash_angebote/src/features/settings/viewmodel/settings_cubit.dart';
 import 'package:flash_angebote/src/features/shopingListPage/sqlite/repo.dart';
 import 'package:flash_angebote/src/features/shopingListPage/view_model/shopping_list_cubit.dart';
 import 'package:flash_angebote/src/features/splash/viewmodel/splash_view_model.dart';
@@ -59,6 +60,9 @@ class MainApp extends StatelessWidget {
         BlocProvider(
           create: (context) => ShoppingListViewCubit(),
         ),
+        BlocProvider(
+          create: (context) => SettingsCubit(),
+        )
       ],
       child: EasyLocalization(
         supportedLocales: LanguageManager.instance.supportedLocales,

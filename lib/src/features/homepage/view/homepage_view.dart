@@ -35,7 +35,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size(context.width, 40.h),
-        child: appBar(context),
+        child: appBar(context, _cubit),
       ),
       backgroundColor: context.colorScheme.background,
       body: BlocBuilder<HomePageCubit, HomePageState>(
@@ -154,17 +154,16 @@ class _HomePageState extends State<HomePage> {
                             fit: BoxFit.fitWidth),
                       ),
                     ),
+                    const Spacer(),
                     SizedBox(
                       height: 15.h,
                       child: Text(
-                        cubit.getExpireDay(
-                              DateFormat('dd/MM/yyyy')
-                                  .parse(cubit.flyerList![index]!.expireDate!),
-                            ) +
-                            ' ' +
-                            LocaleKeys.homepage_days_left.tr(),
-                        style: context.textTheme.labelSmall!
-                            .copyWith(letterSpacing: 0),
+                        '${cubit.getExpireDay(
+                          DateFormat('dd/MM/yyyy')
+                              .parse(cubit.flyerList![index]!.expireDate!),
+                        )} ${LocaleKeys.homepage_days_left.tr()}',
+                        style: context.textTheme.labelSmall!.copyWith(
+                            letterSpacing: 0, color: context.randomColor),
                       ),
                     ),
                     SizedBox(
@@ -318,11 +317,13 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  AppBar appBar(BuildContext context) {
+  AppBar appBar(BuildContext context, HomePageCubit cubit) {
     return AppBar(
       actions: [
         IconButton(
-            onPressed: () {},
+            onPressed: () {
+              cubit.navigateSettings(context);
+            },
             icon: Icon(
               Icons.settings,
               size: 25.sp,

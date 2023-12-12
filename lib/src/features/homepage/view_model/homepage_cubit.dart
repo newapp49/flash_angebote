@@ -1,10 +1,13 @@
 import 'dart:developer';
 import 'dart:math';
 
+import 'package:auto_route/auto_route.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flash_angebote/src/features/homepage/model/company_model.dart';
 import 'package:flash_angebote/src/features/homepage/model/flyer_model.dart';
 import 'package:flash_angebote/src/features/homepage/view_model/homepage_state.dart';
+import 'package:flash_angebote/src/routing/app_router.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -112,6 +115,10 @@ class HomePageCubit extends Cubit<HomePageState> {
           'Location permissions are permanently denied, we cannot request permissions.');
     }
     return await Geolocator.getCurrentPosition();
+  }
+
+  void navigateSettings(BuildContext context) {
+    context.router.push(const SettingsRoute());
   }
 
   Future<void> init() async {

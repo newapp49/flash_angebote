@@ -16,5 +16,11 @@
         "search_item": "Ürün aratın...",
         "most_used": "Sık Kullanılan",
         "what_do_you_whant": "Ne almak istiyorsunuz?"
+    },
+    "settings": {
+        "save": "Değişiklikleri kaydet",
+        "distance_filter": "Gösterilecek en uzak mesafe:",
+        "select_location": "Konum Seç",
+        "change_language": "Dil Değiştir"
     }
 }

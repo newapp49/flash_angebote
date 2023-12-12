@@ -18,7 +18,7 @@ class NavigatorView extends StatefulWidget {
 
 class _NavigatorViewState extends State<NavigatorView> {
   int _activePageIndex = 0;
-  List<Widget> screenList = [const HomePage(), ShopingListPage()];
+  List<Widget> screenList = [const HomePage(), const ShopingListPage()];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,6 +26,8 @@ class _NavigatorViewState extends State<NavigatorView> {
       bottomNavigationBar: SizedBox(
         height: 66.h,
         child: BottomNavigationBar(
+          onTap: (value) => _activePageIndex = value,
+          currentIndex: _activePageIndex,
           iconSize: 18.sp,
           selectedFontSize: 12.sp,
           backgroundColor: context.colorScheme.background,
@@ -40,14 +42,9 @@ class _NavigatorViewState extends State<NavigatorView> {
             ),
             BottomNavigationBarItem(
                 icon: const Icon(
-                  Icons.analytics,
-                ),
-                label: LocaleKeys.homepage_bottombar_discounts.tr()),
-            BottomNavigationBarItem(
-                icon: const Icon(
                   Icons.calendar_month_outlined,
                 ),
-                label: LocaleKeys.homepage_bottombar_activity.tr())
+                label: LocaleKeys.homepage_bottombar_activity.tr()),
           ],
         ),
       ),

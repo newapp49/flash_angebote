@@ -19,7 +19,18 @@ class HomePageCubit extends Cubit<HomePageState> {
   List<FlyerModel?>? flyerList = [];
   Map<int, double> locationList = {};
 
+  List<String> topsideFlyerUrls = [
+    "https://imgv3.fotor.com/images/share/Fotors-party-flyer-templates.jpg",
+    "https://www.befunky.com/images/wp/wp-2021-11-event-flyers-featured-image.jpg?auto=avif,webp&format=jpg&width=1136&crop=16:9",
+    "https://fiverr-res.cloudinary.com/images/t_main1,q_auto,f_auto,q_auto,f_auto/gigs/308749758/original/1dfbf2e0c1297b127e16504413bb5c4805b94f45/do-professional-flyers-invitations-and-posters-for-specific-theme-based-events.png",
+  ];
+
+  DateTime get todayDateTime => DateTime.now();
   late Position locationData;
+  String getExpireDay(DateTime expireDate) {
+    Duration remainingDay = expireDate.difference(todayDateTime);
+    return remainingDay.inDays.toString();
+  }
 
   Future<void> readCompanyData() async {
     await companyDB.get().then((value) {
@@ -36,7 +47,8 @@ class HomePageCubit extends Cubit<HomePageState> {
     await flyerDB.get().then((value) {
       for (var docSnapshot in value.docs) {
         flyerList!.add(
-            FlyerModel.fromJson(docSnapshot.data() as Map<String, dynamic>));
+          FlyerModel.fromJson(docSnapshot.data() as Map<String, dynamic>),
+        );
       }
     });
     flyerList!.sort((a, b) => a!.companyId!.compareTo(b!.companyId!));
@@ -69,7 +81,6 @@ class HomePageCubit extends Cubit<HomePageState> {
             pow(sin(boylamFarki / 2), 2);
     double c = 2 * atan2(sqrt(a), sqrt(1 - a));
     double mesafe = dunyaYariCap * c;
-    print(mesafe);
     return mesafe;
   }
 
@@ -110,6 +121,7 @@ class HomePageCubit extends Cubit<HomePageState> {
     await readCompanyData();
     await readFlyerData();
     fillLocationList();
+    inspect(flyerList);
     emit(const HomePageComplete());
   }
 }

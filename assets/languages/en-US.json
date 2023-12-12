@@ -1,6 +1,6 @@
 {
     "homepage": {
-        "title": "Flyer Angebote",
+        "title": "Flash Angebote",
         "recommended": "Tavsiye Edilenler",
         "meters": "metre",
         "km": "kilometre",
@@ -11,10 +11,10 @@
             "activity": "Aktiviteler"
         }
     },
-    "shopping_list_page":{
-        "share":"Paylaş",
-        "search_item":"Ürün aratın...",
-        "most_used":"Sık Kullanılan",
-        "what_do_you_whant":"Ne almak istiyorsunuz?"
+    "shopping_list_page": {
+        "share": "Paylaş",
+        "search_item": "Ürün aratın...",
+        "most_used": "Sık Kullanılan",
+        "what_do_you_whant": "Ne almak istiyorsunuz?"
     }
 }

@@ -61,12 +61,12 @@ class _HomePageState extends State<HomePage> {
     return SingleChildScrollView(
       child: Column(
         children: [
-          billboardCards(),
+          billboardCards(_cubit),
           SizedBox(height: 5.h),
-          buildPageIndicators(4),
+          buildPageIndicators(_cubit.topsideFlyerUrls.length),
           SizedBox(height: 5.h),
           recommendedText(context),
-          SizedBox(height: 3.h),
+          SizedBox(height: 5.h),
           recommendedFlyerCards(context),
           divider(context),
           closeMarketFlyers(_cubit, context)
@@ -157,7 +157,12 @@ class _HomePageState extends State<HomePage> {
                     SizedBox(
                       height: 15.h,
                       child: Text(
-                        "4 ${LocaleKeys.homepage_days_left.tr()}",
+                        cubit.getExpireDay(
+                              DateFormat('dd/MM/yyyy')
+                                  .parse(cubit.flyerList![index]!.expireDate!),
+                            ) +
+                            ' ' +
+                            LocaleKeys.homepage_days_left.tr(),
                         style: context.textTheme.labelSmall!
                             .copyWith(letterSpacing: 0),
                       ),
@@ -257,7 +262,8 @@ class _HomePageState extends State<HomePage> {
       padding: context.paddingHorizontal2,
       child: Text(
         LocaleKeys.homepage_recommended.tr(),
-        style: context.textTheme.bodyLarge!.copyWith(letterSpacing: 0),
+        style: context.textTheme.bodyLarge!
+            .copyWith(letterSpacing: 0, fontSize: 15.sp),
       ),
     );
   }
@@ -288,19 +294,24 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  SizedBox billboardCards() {
+  SizedBox billboardCards(HomePageCubit cubit) {
     return SizedBox(
       height: 140.h,
       child: PageView.builder(
-        itemCount: 4,
+        itemCount: _cubit.topsideFlyerUrls.length,
         onPageChanged: (value) {},
         itemBuilder: (context, index) {
           return Container(
             width: context.width,
             margin: context.paddingHorizontal2,
             decoration: BoxDecoration(
-                color: context.randomColor,
-                borderRadius: BorderRadius.circular(5.w)),
+              image: DecorationImage(
+                  image: NetworkImage(
+                    cubit.topsideFlyerUrls[index],
+                  ),
+                  fit: BoxFit.cover),
+              borderRadius: BorderRadius.circular(5.w),
+            ),
           );
         },
       ),

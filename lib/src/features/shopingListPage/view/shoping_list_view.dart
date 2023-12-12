@@ -869,14 +869,6 @@ class _ShopingListPageState extends State<ShopingListPage> {
 
   AppBar appBar(BuildContext context) {
     return AppBar(
-      actions: [
-        IconButton(
-            onPressed: () {},
-            icon: Icon(
-              Icons.settings,
-              size: 25.sp,
-            ))
-      ],
       leading: IconButton(
         onPressed: () {
           context.router.pop();

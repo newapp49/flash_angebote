@@ -689,188 +689,206 @@ class _ShopingListPageState extends State<ShopingListPage> {
             width: 2,
           ),
           borderRadius: BorderRadius.all(Radius.circular(4))),
-      child: GestureDetector(
-        onTap: () async {
-          final pdf = pw.Document();
-          final font = pw.Font.ttf(
-              await rootBundle.load("assets/fonts/Roboto-Regular.ttf"));
+      child: Builder(builder: (context) {
+        return GestureDetector(
+          onTap: () async {
+            final pdf = pw.Document();
+            final font = pw.Font.ttf(
+                await rootBundle.load("assets/fonts/Roboto-Regular.ttf"));
 
-          pdf.addPage(
-            pw.MultiPage(
-              footer: (context) {
-                return pw.Footer(
-                    trailing: pw.Text(
-                  "Flash Angebote",
-                  style: pw.TextStyle(
-                    fontSize: 8,
-                    font: font,
-                    fontWeight: pw.FontWeight.bold,
-                    color: PdfColors.white,
-                  ),
-                ));
-              },
-              pageTheme: pw.PageTheme(
-                buildBackground: (context) {
-                  return pw.FullPage(
-                      ignoreMargins: true,
-                      child: pw.Container(color: PdfColor.fromHex("282828")));
+            pdf.addPage(
+              pw.MultiPage(
+                footer: (context) {
+                  return pw.Footer(
+                      trailing: pw.Text(
+                    "Flash Angebote",
+                    style: pw.TextStyle(
+                      fontSize: 8,
+                      font: font,
+                      fontWeight: pw.FontWeight.bold,
+                      color: PdfColors.white,
+                    ),
+                  ));
                 },
-              ),
-              build: (pw.Context context) {
-                return [
-                  pw.Row(
-                    crossAxisAlignment: pw.CrossAxisAlignment.end,
-                    children: [
-                      pw.Text(
-                        "Piknik için listem",
-                        style: pw.TextStyle(
-                          fontSize: 25,
-                          font: font,
-                          fontWeight: pw.FontWeight.bold,
-                          color: PdfColors.white,
+                pageTheme: pw.PageTheme(
+                  buildBackground: (context) {
+                    return pw.FullPage(
+                        ignoreMargins: true,
+                        child: pw.Container(color: PdfColor.fromHex("282828")));
+                  },
+                ),
+                build: (pw.Context context) {
+                  return [
+                    pw.Row(
+                      crossAxisAlignment: pw.CrossAxisAlignment.end,
+                      children: [
+                        pw.Text(
+                          "Piknik için listem",
+                          style: pw.TextStyle(
+                            fontSize: 25,
+                            font: font,
+                            fontWeight: pw.FontWeight.bold,
+                            color: PdfColors.white,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                  pw.ListView.builder(
-                      itemBuilder: (context, index) {
-                        if (index < 5) {
-                          return pw.Padding(
-                            padding:
-                                pw.EdgeInsets.only(top: this.context.value1),
-                            child: pw.Container(
-                              decoration: pw.BoxDecoration(
-                                  color: PdfColor.fromHex("494949"),
-                                  borderRadius: pw.BorderRadius.circular(4)),
-                              child: pw.Row(
-                                crossAxisAlignment: pw.CrossAxisAlignment.start,
-                                children: [
-                                  pw.Padding(
-                                    padding:
-                                        pw.EdgeInsets.all(this.context.value1),
-                                    child: pw.Container(
-                                      width: 60,
-                                      height: 60,
-                                      decoration: pw.BoxDecoration(
-                                          color: PdfColors.white,
-                                          borderRadius:
-                                              pw.BorderRadius.circular(4)),
+                      ],
+                    ),
+                    pw.ListView.builder(
+                        itemBuilder: (context, index) {
+                          if (index < 5) {
+                            return pw.Padding(
+                              padding:
+                                  pw.EdgeInsets.only(top: this.context.value1),
+                              child: pw.Container(
+                                decoration: pw.BoxDecoration(
+                                    color: PdfColor.fromHex("494949"),
+                                    borderRadius: pw.BorderRadius.circular(4)),
+                                child: pw.Row(
+                                  crossAxisAlignment:
+                                      pw.CrossAxisAlignment.start,
+                                  children: [
+                                    pw.Padding(
+                                      padding: pw.EdgeInsets.all(
+                                          this.context.value1),
+                                      child: pw.Container(
+                                        width: 60,
+                                        height: 60,
+                                        decoration: pw.BoxDecoration(
+                                            color: PdfColors.white,
+                                            borderRadius:
+                                                pw.BorderRadius.circular(4)),
+                                      ),
                                     ),
-                                  ),
-                                  pw.Padding(
-                                    padding: pw.EdgeInsets.only(
-                                        top: this.context.value1,
-                                        bottom: this.context.value1),
-                                    child: pw.Container(
-                                      width: 380,
-                                      child: pw.Column(
-                                        crossAxisAlignment:
-                                            pw.CrossAxisAlignment.start,
-                                        children: [
-                                          pw.Row(children: [
+                                    pw.Padding(
+                                      padding: pw.EdgeInsets.only(
+                                          top: this.context.value1,
+                                          bottom: this.context.value1),
+                                      child: pw.Container(
+                                        width: 380,
+                                        child: pw.Column(
+                                          crossAxisAlignment:
+                                              pw.CrossAxisAlignment.start,
+                                          children: [
+                                            pw.Row(children: [
+                                              pw.Text(
+                                                "Lays",
+                                                style: pw.TextStyle(
+                                                  fontSize: 14,
+                                                  font: font,
+                                                  fontWeight:
+                                                      pw.FontWeight.bold,
+                                                  color: PdfColors.white,
+                                                ),
+                                              ),
+                                              pw.Text(
+                                                " - 10 Adet",
+                                                style: pw.TextStyle(
+                                                  fontSize: 14,
+                                                  font: font,
+                                                  fontWeight:
+                                                      pw.FontWeight.bold,
+                                                  color: PdfColors.green300,
+                                                ),
+                                              ),
+                                            ]),
                                             pw.Text(
-                                              "Lays",
+                                              "Lay's Fırından Yoğurt Mevsim Yeşillikleri Patates Cipsi Süper Boy 96 gr",
                                               style: pw.TextStyle(
                                                 fontSize: 14,
                                                 font: font,
                                                 fontWeight: pw.FontWeight.bold,
                                                 color: PdfColors.white,
                                               ),
-                                            ),
-                                            pw.Text(
-                                              " - 10 Adet",
-                                              style: pw.TextStyle(
-                                                fontSize: 14,
-                                                font: font,
-                                                fontWeight: pw.FontWeight.bold,
-                                                color: PdfColors.green300,
-                                              ),
-                                            ),
-                                          ]),
-                                          pw.Text(
-                                            "Lay's Fırından Yoğurt Mevsim Yeşillikleri Patates Cipsi Süper Boy 96 gr",
-                                            style: pw.TextStyle(
-                                              fontSize: 14,
-                                              font: font,
-                                              fontWeight: pw.FontWeight.bold,
-                                              color: PdfColors.white,
-                                            ),
-                                          )
-                                        ],
+                                            )
+                                          ],
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        } else {
-                          return pw.Padding(
-                            padding:
-                                pw.EdgeInsets.only(top: this.context.value1),
-                            child: pw.Container(
-                              width: 5000.w,
-                              padding: pw.EdgeInsets.all(this.context.value1),
-                              decoration: pw.BoxDecoration(
-                                  color: PdfColor.fromHex("494949"),
-                                  borderRadius: pw.BorderRadius.circular(4)),
-                              child: pw.Text(
-                                "Dinozor şeklinde olan kek kalıplarından 5 tane Dinozor şeklinde olan kek kalıplarından 5 tane",
-                                style: pw.TextStyle(
-                                  fontSize: 14,
-                                  font: font,
-                                  fontWeight: pw.FontWeight.bold,
-                                  color: PdfColors.white,
+                                  ],
                                 ),
                               ),
-                            ),
-                          );
-                        }
-                      },
-                      itemCount: 10),
-                ];
-              },
-            ),
-          );
+                            );
+                          } else {
+                            return pw.Padding(
+                              padding:
+                                  pw.EdgeInsets.only(top: this.context.value1),
+                              child: pw.Container(
+                                width: 5000.w,
+                                padding: pw.EdgeInsets.all(this.context.value1),
+                                decoration: pw.BoxDecoration(
+                                    color: PdfColor.fromHex("494949"),
+                                    borderRadius: pw.BorderRadius.circular(4)),
+                                child: pw.Text(
+                                  "Dinozor şeklinde olan kek kalıplarından 5 tane Dinozor şeklinde olan kek kalıplarından 5 tane",
+                                  style: pw.TextStyle(
+                                    fontSize: 14,
+                                    font: font,
+                                    fontWeight: pw.FontWeight.bold,
+                                    color: PdfColors.white,
+                                  ),
+                                ),
+                              ),
+                            );
+                          }
+                        },
+                        itemCount: 10),
+                  ];
+                },
+              ),
+            );
 
-          final directory = await getTemporaryDirectory();
+            final directory = await getTemporaryDirectory();
 
-          final directoryPath = "${directory.path}/Flash Angebote";
+            final directoryPath = "${directory.path}/Flash Angebote";
 
-          if (!await Directory(directoryPath).exists()) {
-            await Directory(directoryPath).create(recursive: true);
-          }
+            if (!await Directory(directoryPath).exists()) {
+              await Directory(directoryPath).create(recursive: true);
+            }
 
-          final file = File("${directoryPath}/MyPdf.pdf");
-          await file.writeAsBytes(await pdf.save());
+            final file = File("${directoryPath}/MyPdf.pdf");
+            await file.writeAsBytes(await pdf.save());
 
-          print("PDF dosyası cihaza kaydedildi: ${file.path}");
+            print("PDF dosyası cihaza kaydedildi: ${file.path}");
 
-          final result = await Share.shareXFiles(
-              [XFile('${directoryPath}/MyPdf.pdf')],
+            if (Platform.isIOS) {
+              final box = context.findRenderObject() as RenderBox?;
+
+              final result = await Share.shareXFiles(
+                  [XFile('${directoryPath}/MyPdf.pdf')],
+                  sharePositionOrigin:
+                      box!.localToGlobal(Offset.zero) & box.size);
+
+              if (result.status == ShareResultStatus.success) {
+                print('Send');
+              }
+            } else {
+              final result = await Share.shareXFiles(
+                [XFile('${directoryPath}/MyPdf.pdf')],
               );
 
-          if (result.status == ShareResultStatus.success) {
-            print('Send');
-          }
-        },
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.share,
-              color: context.colorScheme.onPrimary,
-              size: 25.h,
-            ),
-            Text("Paylaş",
-                overflow: TextOverflow.ellipsis,
-                maxLines: 2,
-                textAlign: TextAlign.center,
-                style: context.textTheme.labelSmall!
-                    .copyWith(color: context.colorScheme.onPrimary)),
-          ],
-        ),
-      ),
+              if (result.status == ShareResultStatus.success) {
+                print('Send File');
+              }
+            }
+          },
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.share,
+                color: context.colorScheme.onPrimary,
+                size: 25.h,
+              ),
+              Text("Paylaş",
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 2,
+                  textAlign: TextAlign.center,
+                  style: context.textTheme.labelSmall!
+                      .copyWith(color: context.colorScheme.onPrimary)),
+            ],
+          ),
+        );
+      }),
     );
   }
 

@@ -1,8 +1,5 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flash_angebote/src/features/homepage/model/flyer_model.dart';
-import 'package:flash_angebote/src/features/homepage/view_model/homepage_cubit.dart';
-import 'package:flash_angebote/src/features/homepage/view_model/homepage_state.dart';
 import 'package:flash_angebote/src/routing/app_router.dart';
 import 'package:flash_angebote/src/shared/utils/extension/context_extension.dart';
 import 'package:flutter/material.dart';
@@ -10,21 +7,24 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/init/lang/locale_keys.g.dart';
+import '../../homepage/model/flyer_model.dart';
+import '../view_model/activity_cubit.dart';
+import '../view_model/activity_state.dart';
 
-@RoutePage(name: 'HomeRoute')
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+@RoutePage(name: 'ActivityRoute')
+class ActivityPage extends StatefulWidget {
+  const ActivityPage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<ActivityPage> createState() => _ActivityPageState();
 }
 
-class _HomePageState extends State<HomePage> {
-  late HomePageCubit _cubit;
+class _ActivityPageState extends State<ActivityPage> {
+  late ActivityPageCubit _cubit;
 
   @override
   void initState() {
-    _cubit = BlocProvider.of<HomePageCubit>(context);
+    _cubit = BlocProvider.of<ActivityPageCubit>(context);
     _cubit.init();
 
     super.initState();
@@ -38,18 +38,18 @@ class _HomePageState extends State<HomePage> {
         child: appBar(context, _cubit),
       ),
       backgroundColor: context.colorScheme.background,
-      body: BlocBuilder<HomePageCubit, HomePageState>(
+      body: BlocBuilder<ActivityPageCubit, ActivityPageState>(
         builder: (BuildContext context, state) {
-          if (state is HomePageInitial) {
+          if (state is ActivityPageInitial) {
             return pageBody(context);
-          } else if (state is HomePageLoading) {
+          } else if (state is ActivityPageLoading) {
             return const Center(
               child: CircularProgressIndicator(),
             );
-          } else if (state is HomePageComplete) {
+          } else if (state is ActivityPageComplete) {
             return pageBody(context);
           } else {
-            final error = state is HomePageError;
+            final error = state is ActivityPageError;
             return Text(error.toString());
           }
         },
@@ -75,7 +75,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  GridView closeMarketFlyers(HomePageCubit cubit, BuildContext context) {
+  GridView closeMarketFlyers(ActivityPageCubit cubit, BuildContext context) {
     return GridView.builder(
       physics: const NeverScrollableScrollPhysics(),
       itemCount: cubit.flyerList!.length,
@@ -235,7 +235,7 @@ class _HomePageState extends State<HomePage> {
               // SizedBox(
               //   height: 15.h,
               //   child: Text(
-              //     "4 ${LocaleKeys.homepage_days_left.tr()}",
+              //     "4 ${LocaleKeys.ActivityPage_days_left.tr()}",
               //     style: context.textTheme.labelSmall!
               //         .copyWith(letterSpacing: 0),
               //   ),
@@ -243,7 +243,7 @@ class _HomePageState extends State<HomePage> {
               // SizedBox(
               //   height: 15.h,
               //   child: Text(
-              //     "1.2 ${LocaleKeys.homepage_km.tr()}",
+              //     "1.2 ${LocaleKeys.ActivityPage_km.tr()}",
               //     style: context.textTheme.labelSmall!
               //         .copyWith(letterSpacing: 0),
               //   ),
@@ -293,7 +293,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  SizedBox billboardCards(HomePageCubit cubit) {
+  SizedBox billboardCards(ActivityPageCubit cubit) {
     return SizedBox(
       height: 140.h,
       child: PageView.builder(
@@ -317,7 +317,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  AppBar appBar(BuildContext context, HomePageCubit cubit) {
+  AppBar appBar(BuildContext context, ActivityPageCubit cubit) {
     return AppBar(
       actions: [
         IconButton(

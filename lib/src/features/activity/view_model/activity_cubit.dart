@@ -3,16 +3,17 @@ import 'dart:math';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flash_angebote/src/features/homepage/model/company_model.dart';
+import 'package:flash_angebote/src/features/activity/view_model/activity_state.dart';
 import 'package:flash_angebote/src/features/homepage/model/flyer_model.dart';
-import 'package:flash_angebote/src/features/homepage/view_model/homepage_state.dart';
 import 'package:flash_angebote/src/routing/app_router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
 
-class HomePageCubit extends Cubit<HomePageState> {
-  HomePageCubit() : super(const HomePageInitial());
+import '../../homepage/model/company_model.dart';
+
+class ActivityPageCubit extends Cubit<ActivityPageState> {
+  ActivityPageCubit() : super(const ActivityPageInitial());
   CollectionReference companyDB =
       FirebaseFirestore.instance.collection('flash_angebote_companies');
   CollectionReference flyerDB =
@@ -124,13 +125,13 @@ class HomePageCubit extends Cubit<HomePageState> {
   }
 
   Future<void> init() async {
-    emit(const HomePageLoading());
+    emit(const ActivityPageLoading());
     //final fcmToken = await FirebaseMessaging.instance.getToken();
     locationData = await _determinePosition();
     await readCompanyData();
     await readFlyerData();
     fillLocationList();
     inspect(flyerList);
-    emit(const HomePageComplete());
+    emit(const ActivityPageComplete());
   }
 }

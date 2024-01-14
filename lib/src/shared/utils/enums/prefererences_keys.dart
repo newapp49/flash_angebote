@@ -1,4 +1,4 @@
 enum PreferencesKeys {
   LANGUAGE,
-  LOCATION,
+  CONSTANT_LOCATION,
 }

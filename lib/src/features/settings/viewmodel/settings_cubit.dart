@@ -24,7 +24,10 @@ class SettingsCubit extends Cubit<SettingsState> {
     emit(const SettingsComplete());
   }
 
-  Future<void> changeLanguage(BuildContext context, String? value) async {
+  Future<void> changeLanguage(
+    BuildContext context,
+    String? value,
+  ) async {
     switch (value) {
       case 'tr-TR':
         await context.setLocale(const Locale('tr', 'TR'));
@@ -46,6 +49,40 @@ class SettingsCubit extends Cubit<SettingsState> {
         break;
 
       default:
+    }
+  }
+
+  Future<void> changeLocation(
+      BuildContext context, String? value, VoidCallback callback) async {
+    switch (value) {
+      case 'Istanbul':
+        await LocaleManager.instance.setStringValue(
+            PreferencesKeys.CONSTANT_LOCATION, value!.toLowerCase());
+        callback();
+        break;
+      case 'Berlin':
+        await LocaleManager.instance.setStringValue(
+            PreferencesKeys.CONSTANT_LOCATION, value!.toLowerCase());
+        callback();
+
+        break;
+      case 'Paris':
+        await LocaleManager.instance.setStringValue(
+            PreferencesKeys.CONSTANT_LOCATION, value!.toLowerCase());
+        callback();
+
+        break;
+      case 'Konumum':
+        await LocaleManager.instance
+            .setStringValue(PreferencesKeys.CONSTANT_LOCATION, '');
+        callback();
+
+        break;
+
+      default:
+        await LocaleManager.instance
+            .setStringValue(PreferencesKeys.CONSTANT_LOCATION, '');
+        callback();
     }
   }
 }

@@ -3,10 +3,13 @@ import 'dart:math';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flash_angebote/core/init/manager/locale_manager.dart';
+import 'package:flash_angebote/src/constants/location_constants.dart';
 import 'package:flash_angebote/src/features/homepage/model/company_model.dart';
 import 'package:flash_angebote/src/features/homepage/model/flyer_model.dart';
 import 'package:flash_angebote/src/features/homepage/view_model/homepage_state.dart';
 import 'package:flash_angebote/src/routing/app_router.dart';
+import 'package:flash_angebote/src/shared/utils/enums/prefererences_keys.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
@@ -93,40 +96,50 @@ class HomePageCubit extends Cubit<HomePageState> {
     return degree * (pi / 180.0);
   }
 
-  Future<Position> _determinePosition() async {
+  Future<void> _determinePosition() async {
     bool serviceEnabled;
     LocationPermission permission;
 
     // Test if location services are enabled.
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      return Future.error('Location services are disabled.');
-    }
+    // if (!serviceEnabled) {
+    //   return Future.error('Location services are disabled.');
+    // }
 
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        return Future.error('Location permissions are denied');
+    // permission = await Geolocator.checkPermission();
+    // if (permission == LocationPermission.denied) {
+    //   permission = await Geolocator.requestPermission();
+    //   if (permission == LocationPermission.denied) {
+    //     return Future.error('Location permissions are denied');
+    //   }
+    // }
+
+    // if (permission == LocationPermission.deniedForever) {
+    //   // Permissions are denied forever, handle appropriately.
+    //   return Future.error(
+    //       'Location permissions are permanently denied, we cannot request permissions.');
+    // }
+    try {
+      if (LocaleManager.instance
+              .getStringValue(PreferencesKeys.CONSTANT_LOCATION) ==
+          '') {
+        locationData = await Geolocator.getCurrentPosition();
+      } else {
+        locationData = PositionConstants.positionConstants[LocaleManager
+            .instance
+            .getStringValue(PreferencesKeys.CONSTANT_LOCATION)]!;
       }
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-      // Permissions are denied forever, handle appropriately.
-      return Future.error(
-          'Location permissions are permanently denied, we cannot request permissions.');
-    }
-    return await Geolocator.getCurrentPosition();
+    } catch (e) {}
   }
 
   void navigateSettings(BuildContext context) {
-    context.router.push(const SettingsRoute());
+    context.router.push(SettingsRoute(callback: init));
   }
 
   Future<void> init() async {
     emit(const HomePageLoading());
     //final fcmToken = await FirebaseMessaging.instance.getToken();
-    locationData = await _determinePosition();
+    await _determinePosition();
     await readCompanyData();
     await readFlyerData();
     fillLocationList();

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/init/lang/locale_keys.g.dart';
+import '../../../../core/init/manager/locale_manager.dart';
 
 @RoutePage(name: 'NavigatorRoute')
 class NavigatorView extends StatefulWidget {
@@ -19,6 +20,8 @@ class _NavigatorViewState extends State<NavigatorView> {
   List<PageRouteInfo> screenList = [const HomeRoute(), const ActivityRoute()];
   @override
   Widget build(BuildContext context) {
+    LocaleManager localeManager = LocaleManager.instance;
+
     return AutoTabsScaffold(
         backgroundColor: context.colorScheme.background,
         routes: screenList,

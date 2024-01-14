@@ -121,7 +121,7 @@ class ActivityPageCubit extends Cubit<ActivityPageState> {
   }
 
   void navigateSettings(BuildContext context) {
-    context.router.push(const SettingsRoute());
+    context.router.push(SettingsRoute(callback: init));
   }
 
   Future<void> init() async {

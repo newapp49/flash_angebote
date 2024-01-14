@@ -1,26 +1,26 @@
 {
     "homepage": {
-        "title": "Flash Angebote",
-        "recommended": "Tavsiye Edilenler",
-        "meters": "metre",
-        "km": "kilometre",
-        "days_left": "gün kaldı",
+        "title": "Flash Deals",
+        "recommended": "Recommended",
+        "meters": "meter",
+        "km": "kilometer",
+        "days_left": "days left",
         "bottombar": {
-            "home": "Genel",
-            "discounts": "İndirimler",
-            "activity": "Aktiviteler"
+            "home": "Home",
+            "discounts": "Discounts",
+            "activity": "Activities"
         }
     },
     "shopping_list_page": {
-        "share": "Paylaş",
-        "search_item": "Ürün aratın...",
-        "most_used": "Sık Kullanılan",
-        "what_do_you_whant": "Ne almak istiyorsunuz?"
+        "share": "Share",
+        "search_item": "Search for a product...",
+        "most_used": "Most Used",
+        "what_do_you_whant": "What do you want to buy?"
     },
     "settings": {
-        "save": "Değişiklikleri kaydet",
-        "distance_filter": "Gösterilecek en uzak mesafe:",
-        "select_location": "Konum Seç",
-        "change_language": "Dil Değiştir"
+        "save": "Save Changes",
+        "distance_filter": "Maximum distance to show:",
+        "select_location": "Select Location",
+        "change_language": "Change Language"
     }
 }

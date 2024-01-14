@@ -1,0 +1,4 @@
+enum PreferencesKeys {
+  LANGUAGE,
+  LOCATION,
+}

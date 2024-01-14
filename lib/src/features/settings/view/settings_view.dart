@@ -79,7 +79,7 @@ class _SettingsViewState extends State<SettingsView> {
                     canCloseOutsideBounds: true,
                     closedFillColor: context.colorScheme.onPrimary,
                     expandedFillColor: context.colorScheme.onPrimary,
-                    onChanged: (p0) => {},
+                    onChanged: (value) => {},
                     initialItem: _cubit.locationDropdownList[0],
                     items: _cubit.locationDropdownList,
                   ),
@@ -100,7 +100,8 @@ class _SettingsViewState extends State<SettingsView> {
                     canCloseOutsideBounds: true,
                     closedFillColor: context.colorScheme.onPrimary,
                     expandedFillColor: context.colorScheme.onPrimary,
-                    onChanged: (p0) => {},
+                    onChanged: (value) =>
+                        {_cubit.changeLanguage(context, value)},
                     initialItem: _cubit.languageDropdownList[0],
                     items: _cubit.languageDropdownList,
                   ),

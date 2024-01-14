@@ -62,7 +62,8 @@ class _SettingsViewState extends State<SettingsView> {
                     canCloseOutsideBounds: true,
                     closedFillColor: context.colorScheme.onPrimary,
                     expandedFillColor: context.colorScheme.onPrimary,
-                    onChanged: (p0) => {},
+                    onChanged: (value) =>
+                        {_cubit.changeMaxDistance(value, callback)},
                     initialItem: _cubit.distanceDropdownList[0],
                     items: _cubit.distanceDropdownList,
                   ),

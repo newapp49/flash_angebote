@@ -78,7 +78,7 @@ class _HomePageState extends State<HomePage> {
   GridView closeMarketFlyers(HomePageCubit cubit, BuildContext context) {
     return GridView.builder(
       physics: const NeverScrollableScrollPhysics(),
-      itemCount: cubit.flyerList!.length,
+      itemCount: cubit.locationList.length,
       scrollDirection: Axis.vertical,
       shrinkWrap: true,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(

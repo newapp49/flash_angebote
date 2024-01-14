@@ -24,6 +24,39 @@ class SettingsCubit extends Cubit<SettingsState> {
     emit(const SettingsComplete());
   }
 
+  Future<void> changeMaxDistance(
+    int? value,
+    VoidCallback callback,
+  ) async {
+    switch (value) {
+      case 5:
+        await LocaleManager.instance
+            .setStringValue(PreferencesKeys.MAX_DISTANCE, value.toString());
+        callback();
+
+        break;
+      case 10:
+        await LocaleManager.instance
+            .setStringValue(PreferencesKeys.MAX_DISTANCE, value.toString());
+        callback();
+        break;
+      case 100:
+        await LocaleManager.instance
+            .setStringValue(PreferencesKeys.MAX_DISTANCE, value.toString());
+        callback();
+        break;
+      case 1000:
+        await LocaleManager.instance
+            .setStringValue(PreferencesKeys.MAX_DISTANCE, value.toString());
+        callback();
+        break;
+      default:
+        await LocaleManager.instance
+            .setStringValue(PreferencesKeys.MAX_DISTANCE, 1000.toString());
+        callback();
+    }
+  }
+
   Future<void> changeLanguage(
     BuildContext context,
     String? value,

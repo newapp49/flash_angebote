@@ -78,7 +78,7 @@ class _ActivityPageState extends State<ActivityPage> {
   GridView closeMarketFlyers(ActivityPageCubit cubit, BuildContext context) {
     return GridView.builder(
       physics: const NeverScrollableScrollPhysics(),
-      itemCount: cubit.flyerList!.length,
+      itemCount: cubit.locationList.length,
       scrollDirection: Axis.vertical,
       shrinkWrap: true,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(

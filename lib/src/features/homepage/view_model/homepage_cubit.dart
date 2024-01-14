@@ -22,8 +22,12 @@ class HomePageCubit extends Cubit<HomePageState> {
       FirebaseFirestore.instance.collection('flash_angebote_flyers');
 
   List<CompanyModel?>? companyList = [];
+
   List<FlyerModel?>? flyerList = [];
+
   Map<int, double> locationList = {};
+
+  late int maxDistanceFilter;
 
   List<String> topsideFlyerUrls = [
     "https://imgv3.fotor.com/images/share/Fotors-party-flyer-templates.jpg",
@@ -36,6 +40,16 @@ class HomePageCubit extends Cubit<HomePageState> {
   String getExpireDay(DateTime expireDate) {
     Duration remainingDay = expireDate.difference(todayDateTime);
     return remainingDay.inDays.toString();
+  }
+
+  Future<void> setDistanceFilter() async {
+    if (LocaleManager.instance.getStringValue(PreferencesKeys.MAX_DISTANCE) ==
+        '') {
+      maxDistanceFilter = 1000;
+    } else {
+      maxDistanceFilter = int.parse(
+          LocaleManager.instance.getStringValue(PreferencesKeys.MAX_DISTANCE));
+    }
   }
 
   Future<void> readCompanyData() async {
@@ -68,7 +82,9 @@ class HomePageCubit extends Cubit<HomePageState> {
     for (var company in companyList!) {
       distance = calculateDistance(company!.latitude!, company.longtitude!)
           .roundToDouble();
-      locationList.addAll({company.companyId!: distance});
+      if (distance <= maxDistanceFilter) {
+        locationList.addAll({company.companyId!: distance});
+      }
     }
   }
 
@@ -142,6 +158,7 @@ class HomePageCubit extends Cubit<HomePageState> {
     await _determinePosition();
     await readCompanyData();
     await readFlyerData();
+    await setDistanceFilter();
     fillLocationList();
     inspect(flyerList);
     emit(const HomePageComplete());

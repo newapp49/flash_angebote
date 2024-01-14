@@ -17,7 +17,7 @@ class ActivityPageCubit extends Cubit<ActivityPageState> {
   CollectionReference companyDB =
       FirebaseFirestore.instance.collection('flash_angebote_companies');
   CollectionReference flyerDB =
-      FirebaseFirestore.instance.collection('flash_angebote_flyers');
+      FirebaseFirestore.instance.collection('flash_angebote_activites');
 
   List<CompanyModel?>? companyList = [];
   List<FlyerModel?>? flyerList = [];

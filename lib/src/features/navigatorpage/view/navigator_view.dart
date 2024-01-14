@@ -20,38 +20,131 @@ class NavigatorView extends StatefulWidget {
 
 class _NavigatorViewState extends State<NavigatorView> {
   int _activePageIndex = 0;
-  List<Widget> screenList = [const HomePage(), const ActivityPage()];
+  List<PageRouteInfo> screenList = [const HomeRoute(), const ActivityRoute()];
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: screenList[_activePageIndex],
-      bottomNavigationBar: SizedBox(
-        height: 66.h,
-        child: BottomNavigationBar(
-          onTap: (value) => setState(() {
-            _activePageIndex = value;
-          }),
-          currentIndex: _activePageIndex,
-          iconSize: 18.sp,
-          selectedFontSize: 12.sp,
-          backgroundColor: context.colorScheme.background,
-          unselectedItemColor: context.colorScheme.onPrimary,
-          selectedItemColor: context.colorScheme.onPrimary,
-          items: [
-            BottomNavigationBarItem(
-              icon: const Icon(
-                Icons.home,
-              ),
-              label: LocaleKeys.homepage_bottombar_home.tr(),
+    return AutoTabsScaffold(
+        backgroundColor: context.colorScheme.background,
+        routes: screenList,
+        transitionBuilder: (context, child, animation) {
+          return child;
+        },
+        extendBody: true,
+        bottomNavigationBuilder: (
+          context,
+          tabsRouter,
+        ) {
+          return Container(
+            width: context.width,
+            height: 70.h,
+            decoration: BoxDecoration(
+              color: context.colorScheme.background,
             ),
-            BottomNavigationBarItem(
-                icon: const Icon(
-                  Icons.calendar_month_outlined,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        tabsRouter.navigate(screenList[0]);
+                      },
+                      child: Column(
+                        children: [
+                          Container(
+                            width: 40.w,
+                            height: 2.w,
+                            decoration: BoxDecoration(
+                                color: tabsRouter.activeIndex == 0
+                                    ? context.colorScheme.onPrimary
+                                    : Colors.transparent,
+                                borderRadius: BorderRadius.circular(10.w)),
+                          ),
+                          SizedBox(height: 3.h),
+                          Icon(
+                            Icons.shopping_basket_rounded,
+                            color: context.colorScheme.onPrimary,
+                            size: 24.w,
+                          ),
+                          SizedBox(height: 3.h),
+                          Text(
+                            LocaleKeys.homepage_bottombar_discounts.tr(),
+                            style: context.textTheme.labelSmall!
+                                .copyWith(letterSpacing: 0),
+                          ),
+                        ],
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        tabsRouter.navigate(screenList[1]);
+                      },
+                      child: Column(
+                        children: [
+                          Container(
+                            width: 40.w,
+                            height: 2.w,
+                            decoration: BoxDecoration(
+                                color: tabsRouter.activeIndex == 1
+                                    ? context.colorScheme.onPrimary
+                                    : Colors.transparent,
+                                borderRadius: BorderRadius.circular(10.w)),
+                          ),
+                          SizedBox(height: 3.h),
+                          Icon(
+                            Icons.event_rounded,
+                            color: context.colorScheme.onPrimary,
+                            size: 24.w,
+                          ),
+                          SizedBox(height: 3.h),
+                          Text(
+                            LocaleKeys.homepage_bottombar_activity.tr(),
+                            style: context.textTheme.labelSmall!
+                                .copyWith(letterSpacing: 0),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-                label: LocaleKeys.homepage_bottombar_activity.tr()),
-          ],
-        ),
-      ),
-    );
+                SizedBox(
+                  height: 10.h,
+                )
+              ],
+            ),
+          );
+        });
+
+    // Scaffold(
+    //   body: screenList[_activePageIndex],
+    //   bottomNavigationBar: SizedBox(
+    //     height: 66.h,
+    //     child: BottomNavigationBar(
+    //       onTap: (value) => setState(() {
+    //         _activePageIndex = value;
+    //       }),
+    //       currentIndex: _activePageIndex,
+    //       iconSize: 18.sp,
+    //       selectedFontSize: 12.sp,
+    //       backgroundColor: context.colorScheme.background,
+    //       unselectedItemColor: context.colorScheme.onPrimary,
+    //       selectedItemColor: context.colorScheme.onPrimary,
+    //       items: [
+    //         BottomNavigationBarItem(
+    //           icon: const Icon(
+    //             Icons.home,
+    //           ),
+    //           label: LocaleKeys.homepage_bottombar_home.tr(),
+    //         ),
+    //         BottomNavigationBarItem(
+    //             icon: const Icon(
+    //               Icons.calendar_month_outlined,
+    //             ),
+    //             label: LocaleKeys.homepage_bottombar_activity.tr()),
+    //       ],
+    //     ),
+    //   ),
+    // );
   }
 }

@@ -1,8 +1,8 @@
-import 'dart:developer';
 import 'dart:math';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flash_angebote/core/init/manager/locale_manager.dart';
 import 'package:flash_angebote/src/constants/location_constants.dart';
 import 'package:flash_angebote/src/features/homepage/model/company_model.dart';
@@ -22,8 +22,10 @@ class HomePageCubit extends Cubit<HomePageState> {
       FirebaseFirestore.instance.collection('flash_angebote_flyers');
 
   List<CompanyModel?>? companyList = [];
+  List<CompanyModel>? favouriteCompanyList = [];
 
   List<FlyerModel?>? flyerList = [];
+  List<CompanyModel>? favouriteFlyerList = [];
 
   Map<int, double> locationList = {};
 
@@ -42,6 +44,15 @@ class HomePageCubit extends Cubit<HomePageState> {
     return remainingDay.inDays.toString();
   }
 
+  FlyerModel? findFavoriteFlyer(int companyId) {
+    for (var flyer in flyerList!) {
+      if (flyer!.companyId == companyId) {
+        return flyer;
+      }
+    }
+    return flyerList![0];
+  }
+
   Future<void> setDistanceFilter() async {
     if (LocaleManager.instance.getStringValue(PreferencesKeys.MAX_DISTANCE) ==
         '') {
@@ -54,6 +65,7 @@ class HomePageCubit extends Cubit<HomePageState> {
 
   Future<void> readCompanyData() async {
     companyList = [];
+    favouriteCompanyList = [];
     await companyDB.get().then((value) {
       for (var docSnapshot in value.docs) {
         companyList!.add(
@@ -61,7 +73,6 @@ class HomePageCubit extends Cubit<HomePageState> {
       }
     });
     companyList!.sort((a, b) => a!.companyId!.compareTo(b!.companyId!));
-    inspect(companyList);
   }
 
   Future<void> readFlyerData() async {
@@ -78,12 +89,16 @@ class HomePageCubit extends Cubit<HomePageState> {
 
   void fillLocationList() {
     double distance;
+    locationList = {};
 
     for (var company in companyList!) {
       distance = calculateDistance(company!.latitude!, company.longtitude!)
           .roundToDouble();
       if (distance <= maxDistanceFilter) {
         locationList.addAll({company.companyId!: distance});
+      }
+      if (company.isFavourite!) {
+        favouriteCompanyList!.add(company);
       }
     }
   }
@@ -118,23 +133,22 @@ class HomePageCubit extends Cubit<HomePageState> {
 
     // Test if location services are enabled.
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    // if (!serviceEnabled) {
-    //   return Future.error('Location services are disabled.');
-    // }
+    if (!serviceEnabled) {
+      return Future.error('Location services are disabled.');
+    }
 
-    // permission = await Geolocator.checkPermission();
-    // if (permission == LocationPermission.denied) {
-    //   permission = await Geolocator.requestPermission();
-    //   if (permission == LocationPermission.denied) {
-    //     return Future.error('Location permissions are denied');
-    //   }
-    // }
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return Future.error('Location permissions are denied');
+      }
+    }
 
-    // if (permission == LocationPermission.deniedForever) {
-    //   // Permissions are denied forever, handle appropriately.
-    //   return Future.error(
-    //       'Location permissions are permanently denied, we cannot request permissions.');
-    // }
+    if (permission == LocationPermission.deniedForever) {
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
+    }
     try {
       if (LocaleManager.instance
               .getStringValue(PreferencesKeys.CONSTANT_LOCATION) ==
@@ -154,13 +168,13 @@ class HomePageCubit extends Cubit<HomePageState> {
 
   Future<void> init() async {
     emit(const HomePageLoading());
-    //final fcmToken = await FirebaseMessaging.instance.getToken();
+    final fcmToken = await FirebaseMessaging.instance.getToken();
     await _determinePosition();
     await readCompanyData();
     await readFlyerData();
     await setDistanceFilter();
     fillLocationList();
-    inspect(flyerList);
+    print(fcmToken);
     emit(const HomePageComplete());
   }
 }

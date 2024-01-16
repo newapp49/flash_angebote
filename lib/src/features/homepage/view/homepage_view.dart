@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flash_angebote/src/features/homepage/model/flyer_model.dart';
@@ -41,13 +43,15 @@ class _HomePageState extends State<HomePage> {
       body: BlocBuilder<HomePageCubit, HomePageState>(
         builder: (BuildContext context, state) {
           if (state is HomePageInitial) {
-            return pageBody(context);
+            return pageBody(context, _cubit);
           } else if (state is HomePageLoading) {
-            return const Center(
-              child: CircularProgressIndicator(),
+            return Center(
+              child: CircularProgressIndicator(
+                color: context.colorScheme.onPrimary,
+              ),
             );
           } else if (state is HomePageComplete) {
-            return pageBody(context);
+            return pageBody(context, _cubit);
           } else {
             final error = state is HomePageError;
             return Text(error.toString());
@@ -57,7 +61,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  SingleChildScrollView pageBody(BuildContext context) {
+  SingleChildScrollView pageBody(BuildContext context, HomePageCubit cubit) {
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -67,7 +71,7 @@ class _HomePageState extends State<HomePage> {
           SizedBox(height: 5.h),
           recommendedText(context),
           SizedBox(height: 5.h),
-          recommendedFlyerCards(context),
+          recommendedFlyerCards(context, cubit),
           divider(context),
           closeMarketFlyers(_cubit, context)
         ],
@@ -82,7 +86,7 @@ class _HomePageState extends State<HomePage> {
       scrollDirection: Axis.vertical,
       shrinkWrap: true,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          childAspectRatio: 0.65.w, crossAxisCount: 2),
+          childAspectRatio: 0.67.w, crossAxisCount: 2),
       itemBuilder: (context, index) {
         return GestureDetector(
           onTap: () {
@@ -93,16 +97,16 @@ class _HomePageState extends State<HomePage> {
                 child: Container(
                   color: context.colorScheme.background,
                   width: context.width,
-                  height: 465.w,
+                  height: 455.w,
                   child: Column(
                     children: [
                       SizedBox(
                         width: context.width,
-                        height: 450.w,
+                        height: 440.w,
                         child: PageView.builder(
                           itemCount: selectedFlyer!.pageCount!,
                           itemBuilder: (context, index) => Container(
-                            height: 450.w,
+                            height: 440.w,
                             width: context.width,
                             decoration: BoxDecoration(
                               image: DecorationImage(
@@ -195,7 +199,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget recommendedFlyerCards(BuildContext context) {
+  Widget recommendedFlyerCards(BuildContext context, HomePageCubit cubit) {
     return Container(
       padding: context.paddingHorizontal2,
       width: context.width,
@@ -211,44 +215,86 @@ class _HomePageState extends State<HomePage> {
           decoration: BoxDecoration(
               color: context.colorScheme.onSurface,
               borderRadius: BorderRadius.circular(5.w)),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                  alignment: Alignment.center,
-                  height: 20.h,
-                  child: Text(
-                    _cubit.companyList![index]!.companyName!,
-                    style: context.textTheme.headlineMedium!
-                        .copyWith(fontSize: 12.sp, fontWeight: FontWeight.bold),
-                  )),
-              Container(
-                width: 100.w,
-                height: 95.h,
-                decoration: BoxDecoration(
-                    image: DecorationImage(
-                        image: NetworkImage(
-                            _cubit.companyList![index]!.companyLogo!),
-                        fit: BoxFit.cover)),
-              ),
-              // const Spacer(),
-              // SizedBox(
-              //   height: 15.h,
-              //   child: Text(
-              //     "4 ${LocaleKeys.homepage_days_left.tr()}",
-              //     style: context.textTheme.labelSmall!
-              //         .copyWith(letterSpacing: 0),
-              //   ),
-              // ),
-              // SizedBox(
-              //   height: 15.h,
-              //   child: Text(
-              //     "1.2 ${LocaleKeys.homepage_km.tr()}",
-              //     style: context.textTheme.labelSmall!
-              //         .copyWith(letterSpacing: 0),
-              //   ),
-              // )
-            ],
+          child: GestureDetector(
+            onTap: () {
+              FlyerModel? selectedFlyer = cubit.findFavoriteFlyer(
+                  cubit.favouriteCompanyList![index].companyId!);
+              showDialog(
+                context: context,
+                builder: (context) => Dialog(
+                  child: Container(
+                    color: context.colorScheme.background,
+                    width: context.width,
+                    height: 465.w,
+                    child: Column(
+                      children: [
+                        SizedBox(
+                          width: context.width,
+                          height: 450.w,
+                          child: PageView.builder(
+                            itemCount: selectedFlyer!.pageCount!,
+                            itemBuilder: (context, index) => Container(
+                              height: 450.w,
+                              width: context.width,
+                              decoration: BoxDecoration(
+                                image: DecorationImage(
+                                    image: NetworkImage(
+                                      selectedFlyer.flyerUrls![index]!,
+                                    ),
+                                    fit: BoxFit.cover),
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 2.w,
+                        ),
+                        buildPageIndicators(selectedFlyer.pageCount!)
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                    alignment: Alignment.center,
+                    height: 20.h,
+                    child: Text(
+                      _cubit.favouriteCompanyList![index].companyName!,
+                      style: context.textTheme.headlineMedium!.copyWith(
+                          fontSize: 12.sp, fontWeight: FontWeight.bold),
+                    )),
+                Container(
+                  width: 100.w,
+                  height: 95.h,
+                  decoration: BoxDecoration(
+                      image: DecorationImage(
+                          image: NetworkImage(
+                              _cubit.favouriteCompanyList![index].companyLogo!),
+                          fit: BoxFit.cover)),
+                ),
+                // const Spacer(),
+                // SizedBox(
+                //   height: 15.h,
+                //   child: Text(
+                //     "4 ${LocaleKeys.homepage_days_left.tr()}",
+                //     style: context.textTheme.labelSmall!
+                //         .copyWith(letterSpacing: 0),
+                //   ),
+                // ),
+                // SizedBox(
+                //   height: 15.h,
+                //   child: Text(
+                //     "1.2 ${LocaleKeys.homepage_km.tr()}",
+                //     style: context.textTheme.labelSmall!
+                //         .copyWith(letterSpacing: 0),
+                //   ),
+                // )
+              ],
+            ),
           ),
         ),
       ),
@@ -294,28 +340,102 @@ class _HomePageState extends State<HomePage> {
   }
 
   SizedBox billboardCards(HomePageCubit cubit) {
+    // PageController'ı oluştur
+    final PageController _pageController = PageController();
+
+    // Timer'ı oluştur
+    Timer? _timer;
+
+    // Sayfa değişim süresi (örneğin, 5 saniye)
+    const Duration pageChangeDuration = Duration(seconds: 5);
+
+    // Timer'ın callback fonksiyonu
+    void _changePage() {
+      final nextPage =
+          (_pageController.page! + 1) % cubit.topsideFlyerUrls.length;
+      _pageController.animateToPage(
+        nextPage.toInt(),
+        duration: Duration(milliseconds: 500),
+        curve: Curves.easeInOut,
+      );
+    }
+
+    _timer = Timer.periodic(pageChangeDuration, (Timer timer) {
+      _changePage();
+    });
+
     return SizedBox(
       height: 140.h,
       child: PageView.builder(
-        itemCount: _cubit.topsideFlyerUrls.length,
+        physics: NeverScrollableScrollPhysics(),
+        controller: _pageController,
+        itemCount: cubit.topsideFlyerUrls.length + 1, // +1 for looping
         onPageChanged: (value) {},
         itemBuilder: (context, index) {
-          return Container(
-            width: context.width,
-            margin: context.paddingHorizontal2,
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                  image: NetworkImage(
-                    cubit.topsideFlyerUrls[index],
+          // Looping
+          if (index == cubit.topsideFlyerUrls.length) {
+            return Container();
+          }
+
+          return GestureDetector(
+            onTap: () {
+              showDialog(
+                context: context,
+                builder: (context) => Dialog(
+                  child: Container(
+                    height: 180.h,
+                    width: context.width,
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                          image: NetworkImage(
+                            cubit.topsideFlyerUrls[index],
+                          ),
+                          fit: BoxFit.fitWidth),
+                    ),
                   ),
-                  fit: BoxFit.cover),
-              borderRadius: BorderRadius.circular(5.w),
+                ),
+              );
+            },
+            child: Container(
+              width: context.width,
+              margin: context.paddingHorizontal2,
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: NetworkImage(cubit.topsideFlyerUrls[index]),
+                  fit: BoxFit.cover,
+                ),
+                borderRadius: BorderRadius.circular(5.0),
+              ),
             ),
           );
         },
       ),
     );
   }
+
+  // SizedBox billboardCards(HomePageCubit cubit) {
+  //   return SizedBox(
+  //     height: 140.h,
+  //     child: PageView.builder(
+  //       itemCount: _cubit.topsideFlyerUrls.length,
+  //       onPageChanged: (value) {},
+  //       itemBuilder: (context, index) {
+  //         return Container(
+  //           width: context.width,
+  //           margin: context.paddingHorizontal2,
+  //           decoration: BoxDecoration(
+  //             image: DecorationImage(
+  //                 image: NetworkImage(
+  //                   cubit.topsideFlyerUrls[index],
+  //                 ),
+  //                 fit: BoxFit.cover),
+  //             borderRadius: BorderRadius.circular(5.w),
+  //           ),
+  //         );
+  //       },
+  //     ),
+  //   );
+  // }
 
   AppBar appBar(BuildContext context, HomePageCubit cubit) {
     return AppBar(

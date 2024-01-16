@@ -23,7 +23,11 @@ class ActivityPageCubit extends Cubit<ActivityPageState> {
       FirebaseFirestore.instance.collection('flash_angebote_activites');
 
   List<CompanyModel?>? companyList = [];
+  List<CompanyModel>? favouriteCompanyList = [];
+
   List<FlyerModel?>? flyerList = [];
+  List<CompanyModel>? favouriteFlyerList = [];
+
   Map<int, double> locationList = {};
   late int maxDistanceFilter;
 
@@ -40,6 +44,15 @@ class ActivityPageCubit extends Cubit<ActivityPageState> {
     return remainingDay.inDays.toString();
   }
 
+  FlyerModel? findFavoriteFlyer(int companyId) {
+    for (var flyer in flyerList!) {
+      if (flyer!.companyId == companyId) {
+        return flyer;
+      }
+    }
+    return flyerList![0];
+  }
+
   Future<void> setDistanceFilter() async {
     if (LocaleManager.instance.getStringValue(PreferencesKeys.MAX_DISTANCE) ==
         '') {
@@ -51,6 +64,8 @@ class ActivityPageCubit extends Cubit<ActivityPageState> {
   }
 
   Future<void> readCompanyData() async {
+    favouriteCompanyList = [];
+
     companyList = [];
     await companyDB.get().then((value) {
       for (var docSnapshot in value.docs) {
@@ -76,12 +91,16 @@ class ActivityPageCubit extends Cubit<ActivityPageState> {
 
   void fillLocationList() {
     double distance;
+    locationList = {};
 
     for (var company in companyList!) {
       distance = calculateDistance(company!.latitude!, company.longtitude!)
           .roundToDouble();
       if (distance <= maxDistanceFilter) {
         locationList.addAll({company.companyId!: distance});
+      }
+      if (company.isFavourite!) {
+        favouriteCompanyList!.add(company);
       }
     }
   }

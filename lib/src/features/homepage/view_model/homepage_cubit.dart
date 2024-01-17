@@ -1,12 +1,15 @@
-import 'dart:developer';
 import 'dart:math';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flash_angebote/core/init/manager/locale_manager.dart';
+import 'package:flash_angebote/src/constants/location_constants.dart';
 import 'package:flash_angebote/src/features/homepage/model/company_model.dart';
 import 'package:flash_angebote/src/features/homepage/model/flyer_model.dart';
 import 'package:flash_angebote/src/features/homepage/view_model/homepage_state.dart';
 import 'package:flash_angebote/src/routing/app_router.dart';
+import 'package:flash_angebote/src/shared/utils/enums/prefererences_keys.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
@@ -19,8 +22,14 @@ class HomePageCubit extends Cubit<HomePageState> {
       FirebaseFirestore.instance.collection('flash_angebote_flyers');
 
   List<CompanyModel?>? companyList = [];
+  List<CompanyModel>? favouriteCompanyList = [];
+
   List<FlyerModel?>? flyerList = [];
+  List<CompanyModel>? favouriteFlyerList = [];
+
   Map<int, double> locationList = {};
+
+  late int maxDistanceFilter;
 
   List<String> topsideFlyerUrls = [
     "https://imgv3.fotor.com/images/share/Fotors-party-flyer-templates.jpg",
@@ -35,8 +44,28 @@ class HomePageCubit extends Cubit<HomePageState> {
     return remainingDay.inDays.toString();
   }
 
+  FlyerModel? findFavoriteFlyer(int companyId) {
+    for (var flyer in flyerList!) {
+      if (flyer!.companyId == companyId) {
+        return flyer;
+      }
+    }
+    return flyerList![0];
+  }
+
+  Future<void> setDistanceFilter() async {
+    if (LocaleManager.instance.getStringValue(PreferencesKeys.MAX_DISTANCE) ==
+        '') {
+      maxDistanceFilter = 1000;
+    } else {
+      maxDistanceFilter = int.parse(
+          LocaleManager.instance.getStringValue(PreferencesKeys.MAX_DISTANCE));
+    }
+  }
+
   Future<void> readCompanyData() async {
     companyList = [];
+    favouriteCompanyList = [];
     await companyDB.get().then((value) {
       for (var docSnapshot in value.docs) {
         companyList!.add(
@@ -44,7 +73,6 @@ class HomePageCubit extends Cubit<HomePageState> {
       }
     });
     companyList!.sort((a, b) => a!.companyId!.compareTo(b!.companyId!));
-    inspect(companyList);
   }
 
   Future<void> readFlyerData() async {
@@ -61,11 +89,17 @@ class HomePageCubit extends Cubit<HomePageState> {
 
   void fillLocationList() {
     double distance;
+    locationList = {};
 
     for (var company in companyList!) {
       distance = calculateDistance(company!.latitude!, company.longtitude!)
           .roundToDouble();
-      locationList.addAll({company.companyId!: distance});
+      if (distance <= maxDistanceFilter) {
+        locationList.addAll({company.companyId!: distance});
+      }
+      if (company.isFavourite!) {
+        favouriteCompanyList!.add(company);
+      }
     }
   }
 
@@ -93,7 +127,7 @@ class HomePageCubit extends Cubit<HomePageState> {
     return degree * (pi / 180.0);
   }
 
-  Future<Position> _determinePosition() async {
+  Future<void> _determinePosition() async {
     bool serviceEnabled;
     LocationPermission permission;
 
@@ -112,25 +146,35 @@ class HomePageCubit extends Cubit<HomePageState> {
     }
 
     if (permission == LocationPermission.deniedForever) {
-      // Permissions are denied forever, handle appropriately.
       return Future.error(
           'Location permissions are permanently denied, we cannot request permissions.');
     }
-    return await Geolocator.getCurrentPosition();
+    try {
+      if (LocaleManager.instance
+              .getStringValue(PreferencesKeys.CONSTANT_LOCATION) ==
+          '') {
+        locationData = await Geolocator.getCurrentPosition();
+      } else {
+        locationData = PositionConstants.positionConstants[LocaleManager
+            .instance
+            .getStringValue(PreferencesKeys.CONSTANT_LOCATION)]!;
+      }
+    } catch (e) {}
   }
 
   void navigateSettings(BuildContext context) {
-    context.router.push(const SettingsRoute());
+    context.router.push(SettingsRoute(callback: init));
   }
 
   Future<void> init() async {
     emit(const HomePageLoading());
-    //final fcmToken = await FirebaseMessaging.instance.getToken();
-    locationData = await _determinePosition();
+    final fcmToken = await FirebaseMessaging.instance.getToken();
+    await _determinePosition();
     await readCompanyData();
     await readFlyerData();
+    await setDistanceFilter();
     fillLocationList();
-    inspect(flyerList);
+    print(fcmToken);
     emit(const HomePageComplete());
   }
 }

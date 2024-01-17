@@ -10,14 +10,18 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 @RoutePage(name: 'SettingsRoute')
 class SettingsView extends StatefulWidget {
-  const SettingsView({super.key});
+  const SettingsView({super.key, required this.callback});
+  final VoidCallback callback;
 
   @override
-  State<SettingsView> createState() => _SettingsViewState();
+  State<SettingsView> createState() => _SettingsViewState(callback: callback);
 }
 
 class _SettingsViewState extends State<SettingsView> {
   late SettingsCubit _cubit;
+  final VoidCallback callback;
+
+  _SettingsViewState({required this.callback});
 
   @override
   void initState() {
@@ -58,7 +62,8 @@ class _SettingsViewState extends State<SettingsView> {
                     canCloseOutsideBounds: true,
                     closedFillColor: context.colorScheme.onPrimary,
                     expandedFillColor: context.colorScheme.onPrimary,
-                    onChanged: (p0) => {},
+                    onChanged: (value) =>
+                        {_cubit.changeMaxDistance(value, callback)},
                     initialItem: _cubit.distanceDropdownList[0],
                     items: _cubit.distanceDropdownList,
                   ),
@@ -79,7 +84,8 @@ class _SettingsViewState extends State<SettingsView> {
                     canCloseOutsideBounds: true,
                     closedFillColor: context.colorScheme.onPrimary,
                     expandedFillColor: context.colorScheme.onPrimary,
-                    onChanged: (p0) => {},
+                    onChanged: (value) =>
+                        {_cubit.changeLocation(context, value, callback)},
                     initialItem: _cubit.locationDropdownList[0],
                     items: _cubit.locationDropdownList,
                   ),
@@ -100,7 +106,8 @@ class _SettingsViewState extends State<SettingsView> {
                     canCloseOutsideBounds: true,
                     closedFillColor: context.colorScheme.onPrimary,
                     expandedFillColor: context.colorScheme.onPrimary,
-                    onChanged: (p0) => {},
+                    onChanged: (value) =>
+                        {_cubit.changeLanguage(context, value)},
                     initialItem: _cubit.languageDropdownList[0],
                     items: _cubit.languageDropdownList,
                   ),

@@ -59,116 +59,113 @@ class _ShopingListPageState extends State<ShopingListPage> {
   SingleChildScrollView bodyPage(BuildContext context, List<String> shopList) {
     return SingleChildScrollView(
       physics: BouncingScrollPhysics(), //NeverScrollableScrollPhysics(),
-      child: Padding(
+      child: Container(
+        width: context.width,
+        height: context.height,
         padding: context.padding2,
-        child: IntrinsicHeight(
-          child: Expanded(
-            child: Row(
-              children: [
-                leftSide(context, shopList),
-                SizedBox(
-                  width: 10.w,
-                ),
-                rightSide(context),
-              ],
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            leftSide(context, shopList),
+            SizedBox(
+              width: 10.w,
             ),
-          ),
+            rightSide(context),
+          ],
         ),
       ),
     );
   }
 
   //Right Side Component
-  Expanded rightSide(BuildContext context) {
-    return Expanded(
-      child: Container(
-        decoration: BoxDecoration(
-          color: context.colorScheme.onSurface,
-          borderRadius: BorderRadius.circular(4),
-        ),
-        child: Padding(
-          padding: context.paddingVertical2,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              topSearchField(context),
-              divider(context),
-              searchBarOpenStateTopContainer(context),
-              Visibility(visible: !sizeBool, child: divider(context)),
-              shopListContainer(context),
-              bottomSearchField(context),
-            ],
-          ),
+  Widget rightSide(BuildContext context) {
+    return Container(
+      width: 230.w,
+      height: 500.h,
+      decoration: BoxDecoration(
+        color: context.colorScheme.onSurface,
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Padding(
+        padding: context.paddingVertical2,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            topSearchField(context),
+            divider(context),
+            searchBarOpenStateTopContainer(context),
+            //     Visibility(visible: !sizeBool, child: divider(context)),
+            //shopListContainer(context),
+            const Spacer(),
+            bottomSearchField(context),
+          ],
         ),
       ),
     );
   }
 
-  Padding bottomSearchField(BuildContext context) {
-    return Padding(
-      padding: context.paddingHorizontal2.copyWith(top: context.value2),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Icon(
-            Icons.camera_alt_outlined,
-            color: context.colorScheme.onPrimary,
-          ),
-          Container(
-            height: 30.h,
-            width: 180.w,
-            child: TextFormField(
-              textAlign: TextAlign.left,
-              controller: _textController,
-              style: context.textTheme.bodyLarge,
-              cursorHeight: 14.h,
-              decoration: InputDecoration(
-                contentPadding: context.leftPadding2,
-                hintText:
-                    "${LocaleKeys.shopping_list_page_what_do_you_whant.tr()}",
-                hintStyle: context.textTheme.titleMedium!
-                    .copyWith(color: context.colorScheme.onPrimary),
-                filled: true,
-                fillColor: context.colorScheme.background,
-                suffixIcon: Padding(
-                  padding: context.leftPadding1,
-                  child: BlocBuilder<ShoppingListViewCubit, ShoppingListView>(
-                    builder: (context, state) {
-                      return GestureDetector(
-                        onTap: () {
-                          if (state is ShoppingListViewEvent) {
-                            BlocProvider.of<ShoppingListViewCubit>(context)
-                                .addTextItem(textIndex, textResult,
-                                    _textController.text);
-                            _textController.clear();
-                          }
-                        },
-                        child: Icon(
-                          Icons.send,
-                          color: context.colorScheme.onPrimary,
-                        ),
-                      );
-                    },
-                  ),
+  Widget bottomSearchField(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Icon(
+          Icons.camera_alt_outlined,
+          color: context.colorScheme.onPrimary,
+        ),
+        Container(
+          height: 30.h,
+          width: 180.w,
+          child: TextFormField(
+            textAlign: TextAlign.left,
+            controller: _textController,
+            style: context.textTheme.bodyLarge,
+            cursorHeight: 14.h,
+            decoration: InputDecoration(
+              contentPadding: context.leftPadding2,
+              hintText:
+                  "${LocaleKeys.shopping_list_page_what_do_you_whant.tr()}",
+              hintStyle: context.textTheme.titleMedium!
+                  .copyWith(color: context.colorScheme.onPrimary),
+              filled: true,
+              fillColor: context.colorScheme.background,
+              suffixIcon: Padding(
+                padding: context.leftPadding1,
+                child: BlocBuilder<ShoppingListViewCubit, ShoppingListView>(
+                  builder: (context, state) {
+                    return GestureDetector(
+                      onTap: () {
+                        if (state is ShoppingListViewEvent) {
+                          BlocProvider.of<ShoppingListViewCubit>(context)
+                              .addTextItem(
+                                  textIndex, textResult, _textController.text);
+                          _textController.clear();
+                        }
+                      },
+                      child: Icon(
+                        Icons.send,
+                        color: context.colorScheme.onPrimary,
+                      ),
+                    );
+                  },
                 ),
-                border: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.amber),
+              ),
+              border: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.amber),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide: BorderSide(
+                  color: context.colorScheme.onTertiary,
                 ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: BorderSide(
-                    color: context.colorScheme.onTertiary,
-                  ),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: BorderSide(color: context.colorScheme.onTertiary),
-                ),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide: BorderSide(color: context.colorScheme.onTertiary),
               ),
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -229,78 +226,75 @@ class _ShopingListPageState extends State<ShopingListPage> {
   Padding shopListContainer(BuildContext context) {
     return Padding(
       padding: context.paddingHorizontal2,
-      child: Expanded(
-        child: Container(
-          width: double.maxFinite,
-          height: sizeBool == true ? context.height - 275.h : 200.h,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              BlocBuilder<ShoppingListViewCubit, ShoppingListView>(
-                  builder: (BuildContext context, state) {
-                if (state is ShoppingListViewEventInitial) {
-                  return Text("");
-                } else if (state is ShoppingListViewEvent) {
-                  return Text(
-                    state.shopList.name,
-                    style: context.textTheme.titleMedium!
-                        .copyWith(color: context.colorScheme.onPrimary),
-                  );
-                }
+      child: Container(
+        width: double.maxFinite,
+        height: sizeBool == true ? context.height - 350.h : 300.h,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            BlocBuilder<ShoppingListViewCubit, ShoppingListView>(
+                builder: (BuildContext context, state) {
+              if (state is ShoppingListViewEventInitial) {
                 return Text("");
-              }),
-              Expanded(
-                child: Container(
-                  child: BlocBuilder<ShoppingListViewCubit, ShoppingListView>(
-                    builder: (BuildContext context, state) {
-                      if (state is ShoppingListViewEventInitial) {
-                        return Center(
+              } else if (state is ShoppingListViewEvent) {
+                return Text(
+                  state.shopList.name,
+                  style: context.textTheme.titleMedium!
+                      .copyWith(color: context.colorScheme.onPrimary),
+                );
+              }
+              return Text("");
+            }),
+            Container(
+              child: BlocBuilder<ShoppingListViewCubit, ShoppingListView>(
+                builder: (BuildContext context, state) {
+                  if (state is ShoppingListViewEventInitial) {
+                    return Center(
+                      child: Text(
+                        "Liste Seç",
+                        style: context.textTheme.titleMedium!
+                            .copyWith(color: context.colorScheme.onPrimary),
+                      ),
+                    );
+                  } else if (state is ShoppingListViewEvent) {
+                    if (state.shopList.result.list.isEmpty) {
+                      return Center(
                           child: Text(
-                            "Liste Seç",
-                            style: context.textTheme.titleMedium!
-                                .copyWith(color: context.colorScheme.onPrimary),
-                          ),
-                        );
-                      } else if (state is ShoppingListViewEvent) {
-                        if (state.shopList.result.list.isEmpty) {
-                          return Center(
-                              child: Text(
-                            "Bu Liste Boş",
-                            style: context.textTheme.titleMedium!
-                                .copyWith(color: context.colorScheme.onPrimary),
-                          ));
+                        "Bu Liste Boş",
+                        style: context.textTheme.titleMedium!
+                            .copyWith(color: context.colorScheme.onPrimary),
+                      ));
+                    }
+                    return ListView.builder(
+                      padding: EdgeInsets.zero,
+                      shrinkWrap: true,
+                      itemCount: state.shopList.result.list.length + 1,
+                      itemBuilder: (context, index) {
+                        if (index == state.shopList.result.list.length ||
+                            state.shopList.result.list.isEmpty) {
+                          return null;
+                        } else if (state.shopList.result.list[index]
+                            is TextItem) {
+                          var a = state.shopList.result.list[index] as TextItem;
+                          return itemWithoutImage(context, a.text);
+                        } else if (state.shopList.result.list[index]
+                            is ImageItem) {
+                          var a =
+                              state.shopList.result.list[index] as ImageItem;
+                          return itemWithImage(context, false, a.text,
+                              a.bottomText, a.adet, index);
                         }
-                        return ListView.builder(
-                          itemCount: state.shopList.result.list.length + 1,
-                          itemBuilder: (context, index) {
-                            if (index == state.shopList.result.list.length ||
-                                state.shopList.result.list.isEmpty) {
-                              return null;
-                            } else if (state.shopList.result.list[index]
-                                is TextItem) {
-                              var a =
-                                  state.shopList.result.list[index] as TextItem;
-                              return itemWithoutImage(context, a.text);
-                            } else if (state.shopList.result.list[index]
-                                is ImageItem) {
-                              var a = state.shopList.result.list[index]
-                                  as ImageItem;
-                              return itemWithImage(context, false, a.text,
-                                  a.bottomText, a.adet, index);
-                            }
 
-                            return null;
-                          },
-                        );
-                      } else {
-                        return Text("bir Hata oluştu");
-                      }
-                    },
-                  ),
-                ),
+                        return null;
+                      },
+                    );
+                  } else {
+                    return Text("bir Hata oluştu");
+                  }
+                },
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -557,59 +551,58 @@ class _ShopingListPageState extends State<ShopingListPage> {
   Column leftSide(BuildContext context, List<String> shopList) {
     return Column(
       children: [
-        Expanded(
-          child: Container(
-            width: 80.w,
-            decoration: BoxDecoration(
-                color: context.colorScheme.onSurface,
-                borderRadius: BorderRadius.circular(4)),
-            child: Padding(
-              padding: context.paddingHorizontal1,
-              child: Column(children: [
-                Container(
-                  width: 80.w,
-                  height: 420.h,
-                  child: RawScrollbar(
-                    crossAxisMargin: -context.value2,
-                    thickness: 5,
-                    thumbVisibility: true,
-                    controller: _firstController,
-                    interactive: true,
-                    thumbColor: context.colorScheme.onTertiary,
-                    radius: Radius.circular(4),
-                    child: BlocBuilder<ShoppingListAddCubit,
-                        ShoppingListChangeEvent>(
-                      builder: (BuildContext context,
-                          ShoppingListChangeEvent state) {
-                        return ListView.builder(
-                          controller: _firstController,
-                          itemCount: state.shopList.length + 1,
-                          itemBuilder: (BuildContext context, int index) {
-                            if (index == state.shopList.length ||
-                                state.shopList.isEmpty) {
-                              return GestureDetector(
-                                  onTap: () {
-                                    BlocProvider.of<ShoppingListAddCubit>(
-                                            context)
-                                        .addShoppingList(ListModel(
-                                            name: "Liste $index",
-                                            result: Result(list: [])));
-                                  },
-                                  child: addShopListContainer(context));
-                            }
-                            return shopListNameContainer(
-                                context,
-                                state.shopList[index].name,
-                                index,
-                                state.shopList[index]);
-                          },
-                        );
-                      },
-                    ),
+        Container(
+          height: 500.h,
+          width: 80.w,
+          decoration: BoxDecoration(
+              color: context.colorScheme.onSurface,
+              borderRadius: BorderRadius.circular(4)),
+          child: Padding(
+            padding: context.paddingHorizontal1,
+            child: Column(children: [
+              Container(
+                width: 80.w,
+                height: 420.h,
+                child: RawScrollbar(
+                  crossAxisMargin: -context.value2,
+                  thickness: 5,
+                  thumbVisibility: true,
+                  controller: _firstController,
+                  interactive: true,
+                  thumbColor: context.colorScheme.onTertiary,
+                  radius: Radius.circular(4),
+                  child: BlocBuilder<ShoppingListAddCubit,
+                      ShoppingListChangeEvent>(
+                    builder:
+                        (BuildContext context, ShoppingListChangeEvent state) {
+                      return ListView.builder(
+                        padding: EdgeInsets.zero,
+                        controller: _firstController,
+                        itemCount: state.shopList.length + 1,
+                        itemBuilder: (BuildContext context, int index) {
+                          if (index == state.shopList.length ||
+                              state.shopList.isEmpty) {
+                            return GestureDetector(
+                                onTap: () {
+                                  BlocProvider.of<ShoppingListAddCubit>(context)
+                                      .addShoppingList(ListModel(
+                                          name: "Liste $index",
+                                          result: Result(list: [])));
+                                },
+                                child: addShopListContainer(context));
+                          }
+                          return shopListNameContainer(
+                              context,
+                              state.shopList[index].name,
+                              index,
+                              state.shopList[index]);
+                        },
+                      );
+                    },
                   ),
                 ),
-              ]),
-            ),
+              ),
+            ]),
           ),
         ),
         SizedBox(

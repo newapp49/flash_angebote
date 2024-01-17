@@ -10,6 +10,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
 
+import '../../../../core/init/manager/locale_manager.dart';
+import '../../../constants/location_constants.dart';
+import '../../../shared/utils/enums/prefererences_keys.dart';
 import '../../homepage/model/company_model.dart';
 
 class ActivityPageCubit extends Cubit<ActivityPageState> {
@@ -17,11 +20,16 @@ class ActivityPageCubit extends Cubit<ActivityPageState> {
   CollectionReference companyDB =
       FirebaseFirestore.instance.collection('flash_angebote_companies');
   CollectionReference flyerDB =
-      FirebaseFirestore.instance.collection('flash_angebote_flyers');
+      FirebaseFirestore.instance.collection('flash_angebote_activites');
 
   List<CompanyModel?>? companyList = [];
+  List<CompanyModel>? favouriteCompanyList = [];
+
   List<FlyerModel?>? flyerList = [];
+  List<CompanyModel>? favouriteFlyerList = [];
+
   Map<int, double> locationList = {};
+  late int maxDistanceFilter;
 
   List<String> topsideFlyerUrls = [
     "https://imgv3.fotor.com/images/share/Fotors-party-flyer-templates.jpg",
@@ -36,7 +44,28 @@ class ActivityPageCubit extends Cubit<ActivityPageState> {
     return remainingDay.inDays.toString();
   }
 
+  FlyerModel? findFavoriteFlyer(int companyId) {
+    for (var flyer in flyerList!) {
+      if (flyer!.companyId == companyId) {
+        return flyer;
+      }
+    }
+    return flyerList![0];
+  }
+
+  Future<void> setDistanceFilter() async {
+    if (LocaleManager.instance.getStringValue(PreferencesKeys.MAX_DISTANCE) ==
+        '') {
+      maxDistanceFilter = 1000;
+    } else {
+      maxDistanceFilter = int.parse(
+          LocaleManager.instance.getStringValue(PreferencesKeys.MAX_DISTANCE));
+    }
+  }
+
   Future<void> readCompanyData() async {
+    favouriteCompanyList = [];
+
     companyList = [];
     await companyDB.get().then((value) {
       for (var docSnapshot in value.docs) {
@@ -62,11 +91,17 @@ class ActivityPageCubit extends Cubit<ActivityPageState> {
 
   void fillLocationList() {
     double distance;
+    locationList = {};
 
     for (var company in companyList!) {
       distance = calculateDistance(company!.latitude!, company.longtitude!)
           .roundToDouble();
-      locationList.addAll({company.companyId!: distance});
+      if (distance <= maxDistanceFilter) {
+        locationList.addAll({company.companyId!: distance});
+      }
+      if (company.isFavourite!) {
+        favouriteCompanyList!.add(company);
+      }
     }
   }
 
@@ -94,42 +129,54 @@ class ActivityPageCubit extends Cubit<ActivityPageState> {
     return degree * (pi / 180.0);
   }
 
-  Future<Position> _determinePosition() async {
+  Future<void> _determinePosition() async {
     bool serviceEnabled;
     LocationPermission permission;
 
     // Test if location services are enabled.
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      return Future.error('Location services are disabled.');
-    }
+    // if (!serviceEnabled) {
+    //   return Future.error('Location services are disabled.');
+    // }
 
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        return Future.error('Location permissions are denied');
+    // permission = await Geolocator.checkPermission();
+    // if (permission == LocationPermission.denied) {
+    //   permission = await Geolocator.requestPermission();
+    //   if (permission == LocationPermission.denied) {
+    //     return Future.error('Location permissions are denied');
+    //   }
+    // }
+
+    // if (permission == LocationPermission.deniedForever) {
+    //   // Permissions are denied forever, handle appropriately.
+    //   return Future.error(
+    //       'Location permissions are permanently denied, we cannot request permissions.');
+    // }
+    try {
+      if (LocaleManager.instance
+              .getStringValue(PreferencesKeys.CONSTANT_LOCATION) ==
+          '') {
+        locationData = await Geolocator.getCurrentPosition();
+      } else {
+        locationData = PositionConstants.positionConstants[LocaleManager
+            .instance
+            .getStringValue(PreferencesKeys.CONSTANT_LOCATION)]!;
       }
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-      // Permissions are denied forever, handle appropriately.
-      return Future.error(
-          'Location permissions are permanently denied, we cannot request permissions.');
-    }
-    return await Geolocator.getCurrentPosition();
+    } catch (e) {}
   }
 
   void navigateSettings(BuildContext context) {
-    context.router.push(const SettingsRoute());
+    context.router.push(SettingsRoute(callback: init));
   }
 
   Future<void> init() async {
     emit(const ActivityPageLoading());
     //final fcmToken = await FirebaseMessaging.instance.getToken();
-    locationData = await _determinePosition();
+    await _determinePosition();
     await readCompanyData();
     await readFlyerData();
+    await setDistanceFilter();
+
     fillLocationList();
     inspect(flyerList);
     emit(const ActivityPageComplete());

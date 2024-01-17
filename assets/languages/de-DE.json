@@ -1,0 +1,26 @@
+{
+    "homepage": {
+        "title": "Flash Angebote",
+        "recommended": "Empfohlen",
+        "meters": "Meter",
+        "km": "Kilometer",
+        "days_left": "Tage übrig",
+        "bottombar": {
+            "home": "Startseite",
+            "discounts": "Rabatte",
+            "activity": "Aktivitäten"
+        }
+    },
+    "shopping_list_page": {
+        "share": "Teilen",
+        "search_item": "Produkt suchen...",
+        "most_used": "Am häufigsten verwendet",
+        "what_do_you_whant": "Was möchten Sie kaufen?"
+    },
+    "settings": {
+        "save": "Änderungen speichern",
+        "distance_filter": "Maximale Entfernung anzeigen:",
+        "select_location": "Ort auswählen",
+        "change_language": "Sprache ändern"
+    }
+}

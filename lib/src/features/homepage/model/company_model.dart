@@ -4,7 +4,7 @@ part 'company_model.g.dart';
 
 @JsonSerializable()
 class CompanyModel {
-  int? companyId;
+  String? uid;
   String? companyLogo;
   String? companyName;
   double? latitude;
@@ -12,7 +12,7 @@ class CompanyModel {
   bool? isFavourite;
 
   CompanyModel(
-      {this.companyId,
+      {this.uid,
       this.companyName,
       this.latitude,
       this.longtitude,

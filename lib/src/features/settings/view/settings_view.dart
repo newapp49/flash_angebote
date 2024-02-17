@@ -1,9 +1,9 @@
 import 'package:animated_custom_dropdown/custom_dropdown.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flash_angebote/core/init/lang/locale_keys.g.dart';
-import 'package:flash_angebote/src/features/settings/viewmodel/settings_cubit.dart';
-import 'package:flash_angebote/src/shared/utils/extension/context_extension.dart';
+import 'package:wingo/core/init/lang/locale_keys.g.dart';
+import 'package:wingo/src/features/settings/viewmodel/settings_cubit.dart';
+import 'package:wingo/src/shared/utils/extension/context_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';

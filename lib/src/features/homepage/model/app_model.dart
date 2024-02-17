@@ -1,5 +1,5 @@
-import 'package:flash_angebote/src/features/homepage/model/company_model.dart';
-import 'package:flash_angebote/src/features/homepage/model/flyer_model.dart';
+import 'package:wingo/src/features/homepage/model/company_model.dart';
+import 'package:wingo/src/features/homepage/model/flyer_model.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'app_model.g.dart';

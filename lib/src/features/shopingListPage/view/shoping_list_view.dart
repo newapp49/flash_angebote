@@ -2,13 +2,13 @@ import 'dart:io';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flash_angebote/core/init/lang/locale_keys.g.dart';
-import 'package:flash_angebote/src/features/shopingListPage/model/image_item.model.dart';
-import 'package:flash_angebote/src/features/shopingListPage/model/list_model.dart';
-import 'package:flash_angebote/src/features/shopingListPage/model/text_item_model.dart';
-import 'package:flash_angebote/src/features/shopingListPage/view_model/shopping_list_cubit.dart';
-import 'package:flash_angebote/src/features/shopingListPage/view_model/shopping_list_state.dart';
-import 'package:flash_angebote/src/shared/utils/extension/context_extension.dart';
+import 'package:wingo/core/init/lang/locale_keys.g.dart';
+import 'package:wingo/src/features/shopingListPage/model/image_item.model.dart';
+import 'package:wingo/src/features/shopingListPage/model/list_model.dart';
+import 'package:wingo/src/features/shopingListPage/model/text_item_model.dart';
+import 'package:wingo/src/features/shopingListPage/view_model/shopping_list_cubit.dart';
+import 'package:wingo/src/features/shopingListPage/view_model/shopping_list_state.dart';
+import 'package:wingo/src/shared/utils/extension/context_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -694,7 +694,7 @@ class _ShopingListPageState extends State<ShopingListPage> {
                 footer: (context) {
                   return pw.Footer(
                       trailing: pw.Text(
-                    "Flash Angebote",
+                    "Wingoo",
                     style: pw.TextStyle(
                       fontSize: 8,
                       font: font,
@@ -832,7 +832,7 @@ class _ShopingListPageState extends State<ShopingListPage> {
 
             final directory = await getTemporaryDirectory();
 
-            final directoryPath = "${directory.path}/Flash Angebote";
+            final directoryPath = "${directory.path}/Wingoo";
 
             if (!await Directory(directoryPath).exists()) {
               await Directory(directoryPath).create(recursive: true);

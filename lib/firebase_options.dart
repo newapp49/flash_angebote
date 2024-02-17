@@ -17,10 +17,7 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -28,10 +25,7 @@ class DefaultFirebaseOptions {
       case TargetPlatform.iOS:
         return ios;
       case TargetPlatform.macOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for macos - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return macos;
       case TargetPlatform.windows:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for windows - '
@@ -49,12 +43,25 @@ class DefaultFirebaseOptions {
     }
   }
 
-  static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyAOfH1pnLp88T0dJHYLAOb-5n9E-l9ioGI',
-    appId: '1:926172492269:android:956a8a3ae120c333cdb7e4',
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyDJIfOw_yv_OEXXNM4fpb_Qi2KipOTzSpU',
+    appId: '1:926172492269:web:4434f416eb606bd1cdb7e4',
     messagingSenderId: '926172492269',
     projectId: 'flyer-angebote',
-    databaseURL: 'https://flyer-angebote-default-rtdb.europe-west1.firebasedatabase.app',
+    authDomain: 'flyer-angebote.firebaseapp.com',
+    databaseURL:
+        'https://flyer-angebote-default-rtdb.europe-west1.firebasedatabase.app',
+    storageBucket: 'flyer-angebote.appspot.com',
+    measurementId: 'G-F7JLEEDQ16',
+  );
+
+  static const FirebaseOptions android = FirebaseOptions(
+    apiKey: 'AIzaSyAOfH1pnLp88T0dJHYLAOb-5n9E-l9ioGI',
+    appId: '1:926172492269:android:957cee317811c159cdb7e4',
+    messagingSenderId: '926172492269',
+    projectId: 'flyer-angebote',
+    databaseURL:
+        'https://flyer-angebote-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'flyer-angebote.appspot.com',
   );
 
@@ -63,8 +70,20 @@ class DefaultFirebaseOptions {
     appId: '1:926172492269:ios:445a70898aa96c53cdb7e4',
     messagingSenderId: '926172492269',
     projectId: 'flyer-angebote',
-    databaseURL: 'https://flyer-angebote-default-rtdb.europe-west1.firebasedatabase.app',
+    databaseURL:
+        'https://flyer-angebote-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'flyer-angebote.appspot.com',
-    iosBundleId: 'com.example.flashAngebote',
+    iosBundleId: 'com.nixar.wingo',
+  );
+
+  static const FirebaseOptions macos = FirebaseOptions(
+    apiKey: 'AIzaSyB2orPREaudg6E2tti5JgBC3b_r0SZpAD8',
+    appId: '1:926172492269:ios:0618d362b2a67bfacdb7e4',
+    messagingSenderId: '926172492269',
+    projectId: 'flyer-angebote',
+    databaseURL:
+        'https://flyer-angebote-default-rtdb.europe-west1.firebasedatabase.app',
+    storageBucket: 'flyer-angebote.appspot.com',
+    iosBundleId: 'com.nixar.wingo.RunnerTests',
   );
 }

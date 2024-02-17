@@ -1,6 +1,6 @@
 {
-    "name": "flash_angebote",
-    "short_name": "flash_angebote",
+    "name": "wingo",
+    "short_name": "wingo",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

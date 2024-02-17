@@ -1,5 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flash_angebote/src/features/settings/viewmodel/settings_state.dart';
+import 'package:wingo/src/features/settings/viewmodel/settings_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 

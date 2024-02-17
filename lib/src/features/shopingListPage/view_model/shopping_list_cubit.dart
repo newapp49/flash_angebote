@@ -1,8 +1,8 @@
-import 'package:flash_angebote/src/features/shopingListPage/model/image_item.model.dart';
-import 'package:flash_angebote/src/features/shopingListPage/model/list_model.dart';
-import 'package:flash_angebote/src/features/shopingListPage/model/text_item_model.dart';
-import 'package:flash_angebote/src/features/shopingListPage/sqlite/repo.dart';
-import 'package:flash_angebote/src/features/shopingListPage/view_model/shopping_list_state.dart';
+import 'package:wingo/src/features/shopingListPage/model/image_item.model.dart';
+import 'package:wingo/src/features/shopingListPage/model/list_model.dart';
+import 'package:wingo/src/features/shopingListPage/model/text_item_model.dart';
+import 'package:wingo/src/features/shopingListPage/sqlite/repo.dart';
+import 'package:wingo/src/features/shopingListPage/view_model/shopping_list_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 

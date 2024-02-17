@@ -3,13 +3,13 @@ import 'dart:math';
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flash_angebote/core/init/manager/locale_manager.dart';
-import 'package:flash_angebote/src/constants/location_constants.dart';
-import 'package:flash_angebote/src/features/homepage/model/company_model.dart';
-import 'package:flash_angebote/src/features/homepage/model/flyer_model.dart';
-import 'package:flash_angebote/src/features/homepage/view_model/homepage_state.dart';
-import 'package:flash_angebote/src/routing/app_router.dart';
-import 'package:flash_angebote/src/shared/utils/enums/prefererences_keys.dart';
+import 'package:wingo/core/init/manager/locale_manager.dart';
+import 'package:wingo/src/constants/location_constants.dart';
+import 'package:wingo/src/features/homepage/model/company_model.dart';
+import 'package:wingo/src/features/homepage/model/flyer_model.dart';
+import 'package:wingo/src/features/homepage/view_model/homepage_state.dart';
+import 'package:wingo/src/routing/app_router.dart';
+import 'package:wingo/src/shared/utils/enums/prefererences_keys.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
@@ -17,7 +17,7 @@ import 'package:geolocator/geolocator.dart';
 class HomePageCubit extends Cubit<HomePageState> {
   HomePageCubit() : super(const HomePageInitial());
   CollectionReference companyDB =
-      FirebaseFirestore.instance.collection('flash_angebote_companies');
+      FirebaseFirestore.instance.collection('Users');
   CollectionReference flyerDB =
       FirebaseFirestore.instance.collection('flash_angebote_flyers');
 
@@ -27,7 +27,7 @@ class HomePageCubit extends Cubit<HomePageState> {
   List<FlyerModel?>? flyerList = [];
   List<CompanyModel>? favouriteFlyerList = [];
 
-  Map<int, double> locationList = {};
+  Map<String, double> locationList = {};
 
   late int maxDistanceFilter;
 
@@ -44,7 +44,7 @@ class HomePageCubit extends Cubit<HomePageState> {
     return remainingDay.inDays.toString();
   }
 
-  FlyerModel? findFavoriteFlyer(int companyId) {
+  FlyerModel? findFavoriteFlyer(String companyId) {
     for (var flyer in flyerList!) {
       if (flyer!.companyId == companyId) {
         return flyer;
@@ -72,7 +72,7 @@ class HomePageCubit extends Cubit<HomePageState> {
             CompanyModel.fromJson(docSnapshot.data() as Map<String, dynamic>));
       }
     });
-    companyList!.sort((a, b) => a!.companyId!.compareTo(b!.companyId!));
+    companyList!.sort((a, b) => a!.uid!.compareTo(b!.uid!));
   }
 
   Future<void> readFlyerData() async {
@@ -95,9 +95,9 @@ class HomePageCubit extends Cubit<HomePageState> {
       distance = calculateDistance(company!.latitude!, company.longtitude!)
           .roundToDouble();
       if (distance <= maxDistanceFilter) {
-        locationList.addAll({company.companyId!: distance});
+        locationList.addAll({company.uid!: distance});
       }
-      if (company.isFavourite!) {
+      if (company.isFavourite != null && company.isFavourite!) {
         favouriteCompanyList!.add(company);
       }
     }

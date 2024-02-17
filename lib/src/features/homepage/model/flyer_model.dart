@@ -4,7 +4,7 @@ part 'flyer_model.g.dart';
 
 @JsonSerializable()
 class FlyerModel {
-  int? companyId;
+  String? companyId;
   int? pageCount;
   String? picture;
   String? expireDate;

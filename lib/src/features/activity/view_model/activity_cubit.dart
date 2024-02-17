@@ -3,9 +3,9 @@ import 'dart:math';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flash_angebote/src/features/activity/view_model/activity_state.dart';
-import 'package:flash_angebote/src/features/homepage/model/flyer_model.dart';
-import 'package:flash_angebote/src/routing/app_router.dart';
+import 'package:wingo/src/features/activity/view_model/activity_state.dart';
+import 'package:wingo/src/features/homepage/model/flyer_model.dart';
+import 'package:wingo/src/routing/app_router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
@@ -18,9 +18,9 @@ import '../../homepage/model/company_model.dart';
 class ActivityPageCubit extends Cubit<ActivityPageState> {
   ActivityPageCubit() : super(const ActivityPageInitial());
   CollectionReference companyDB =
-      FirebaseFirestore.instance.collection('flash_angebote_companies');
+      FirebaseFirestore.instance.collection('wingo_companies');
   CollectionReference flyerDB =
-      FirebaseFirestore.instance.collection('flash_angebote_activites');
+      FirebaseFirestore.instance.collection('wingo_activites');
 
   List<CompanyModel?>? companyList = [];
   List<CompanyModel>? favouriteCompanyList = [];
@@ -28,7 +28,7 @@ class ActivityPageCubit extends Cubit<ActivityPageState> {
   List<FlyerModel?>? flyerList = [];
   List<CompanyModel>? favouriteFlyerList = [];
 
-  Map<int, double> locationList = {};
+  Map<String, double> locationList = {};
   late int maxDistanceFilter;
 
   List<String> topsideFlyerUrls = [
@@ -44,7 +44,7 @@ class ActivityPageCubit extends Cubit<ActivityPageState> {
     return remainingDay.inDays.toString();
   }
 
-  FlyerModel? findFavoriteFlyer(int companyId) {
+  FlyerModel? findFavoriteFlyer(String companyId) {
     for (var flyer in flyerList!) {
       if (flyer!.companyId == companyId) {
         return flyer;
@@ -73,7 +73,7 @@ class ActivityPageCubit extends Cubit<ActivityPageState> {
             CompanyModel.fromJson(docSnapshot.data() as Map<String, dynamic>));
       }
     });
-    companyList!.sort((a, b) => a!.companyId!.compareTo(b!.companyId!));
+    companyList!.sort((a, b) => a!.uid!.compareTo(b!.uid!));
     inspect(companyList);
   }
 
@@ -97,7 +97,7 @@ class ActivityPageCubit extends Cubit<ActivityPageState> {
       distance = calculateDistance(company!.latitude!, company.longtitude!)
           .roundToDouble();
       if (distance <= maxDistanceFilter) {
-        locationList.addAll({company.companyId!: distance});
+        locationList.addAll({company.uid!: distance});
       }
       if (company.isFavourite!) {
         favouriteCompanyList!.add(company);

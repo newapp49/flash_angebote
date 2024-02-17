@@ -2,11 +2,11 @@ import 'dart:async';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flash_angebote/src/features/homepage/model/flyer_model.dart';
-import 'package:flash_angebote/src/features/homepage/view_model/homepage_cubit.dart';
-import 'package:flash_angebote/src/features/homepage/view_model/homepage_state.dart';
-import 'package:flash_angebote/src/routing/app_router.dart';
-import 'package:flash_angebote/src/shared/utils/extension/context_extension.dart';
+import 'package:wingo/src/features/homepage/model/flyer_model.dart';
+import 'package:wingo/src/features/homepage/view_model/homepage_cubit.dart';
+import 'package:wingo/src/features/homepage/view_model/homepage_state.dart';
+import 'package:wingo/src/routing/app_router.dart';
+import 'package:wingo/src/shared/utils/extension/context_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -71,7 +71,7 @@ class _HomePageState extends State<HomePage> {
           SizedBox(height: 5.h),
           recommendedText(context),
           SizedBox(height: 5.h),
-          recommendedFlyerCards(context, cubit),
+          // recommendedFlyerCards(context, cubit),
           divider(context),
           closeMarketFlyers(_cubit, context)
         ],
@@ -217,8 +217,8 @@ class _HomePageState extends State<HomePage> {
               borderRadius: BorderRadius.circular(5.w)),
           child: GestureDetector(
             onTap: () {
-              FlyerModel? selectedFlyer = cubit.findFavoriteFlyer(
-                  cubit.favouriteCompanyList![index].companyId!);
+              FlyerModel? selectedFlyer = cubit
+                  .findFavoriteFlyer(cubit.favouriteCompanyList![index].uid!);
               showDialog(
                 context: context,
                 builder: (context) => Dialog(
@@ -341,7 +341,7 @@ class _HomePageState extends State<HomePage> {
 
   SizedBox billboardCards(HomePageCubit cubit) {
     // PageController'ı oluştur
-    final PageController _pageController = PageController();
+    final PageController pageController = PageController();
 
     // Timer'ı oluştur
     Timer? _timer;
@@ -350,25 +350,25 @@ class _HomePageState extends State<HomePage> {
     const Duration pageChangeDuration = Duration(seconds: 5);
 
     // Timer'ın callback fonksiyonu
-    void _changePage() {
+    void changePage() {
       final nextPage =
-          (_pageController.page! + 1) % cubit.topsideFlyerUrls.length;
-      _pageController.animateToPage(
+          (pageController.page! + 1) % cubit.topsideFlyerUrls.length;
+      pageController.animateToPage(
         nextPage.toInt(),
-        duration: Duration(milliseconds: 500),
+        duration: const Duration(milliseconds: 500),
         curve: Curves.easeInOut,
       );
     }
 
     _timer = Timer.periodic(pageChangeDuration, (Timer timer) {
-      _changePage();
+      changePage();
     });
 
     return SizedBox(
       height: 140.h,
       child: PageView.builder(
-        physics: NeverScrollableScrollPhysics(),
-        controller: _pageController,
+        physics: const NeverScrollableScrollPhysics(),
+        controller: pageController,
         itemCount: cubit.topsideFlyerUrls.length + 1, // +1 for looping
         onPageChanged: (value) {},
         itemBuilder: (context, index) {

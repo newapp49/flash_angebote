@@ -1,11 +1,12 @@
-
-class ListModel {
+import 'package:hive/hive.dart';
+part 'list_model.g.dart';
+@HiveType(typeId: 2)
+class ListModel extends HiveObject {
+  @HiveField(0)
   String name;
-  Result result = Result(list: []);
-  ListModel({required this.name,required this.result});
+  @HiveField(1)
+  List<dynamic> result = [];
+
+  ListModel({required this.name, required this.result});
 }
 
-class Result {
-  List<dynamic> list;
-  Result({required this.list});
-}

@@ -1,3 +1,4 @@
+import 'package:wingo/src/features/shopingListPage/model/firebaseProductModel.dart';
 import 'package:wingo/src/features/shopingListPage/model/list_model.dart';
 
 abstract class ShoppingListState {
@@ -21,8 +22,6 @@ class ShoppingListChangeEvent {
   const ShoppingListChangeEvent(this.shopList);
 }
 
-
-
 abstract class ShoppingListView {
   const ShoppingListView();
 }
@@ -34,4 +33,20 @@ class ShoppingListViewEventInitial extends ShoppingListView {
 class ShoppingListViewEvent extends ShoppingListView {
   final ListModel shopList;
   const ShoppingListViewEvent(this.shopList);
+}
+
+
+
+
+abstract class SearchListView {
+  const SearchListView();
+}
+
+class SearchListViewInitial extends SearchListView {
+  const SearchListViewInitial();
+}
+
+class SearchListViewOnItemCame extends SearchListView {
+  final List<FirebaseProductModel> list;
+  const SearchListViewOnItemCame(this.list);
 }

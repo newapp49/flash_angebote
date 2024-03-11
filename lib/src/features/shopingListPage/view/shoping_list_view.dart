@@ -2,10 +2,12 @@ import 'dart:io';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:hive/hive.dart';
 import 'package:wingo/core/init/lang/locale_keys.g.dart';
 import 'package:wingo/src/features/shopingListPage/model/image_item.model.dart';
 import 'package:wingo/src/features/shopingListPage/model/list_model.dart';
 import 'package:wingo/src/features/shopingListPage/model/text_item_model.dart';
+import 'package:wingo/src/features/shopingListPage/sqlite/repo.dart';
 import 'package:wingo/src/features/shopingListPage/view_model/shopping_list_cubit.dart';
 import 'package:wingo/src/features/shopingListPage/view_model/shopping_list_state.dart';
 import 'package:wingo/src/shared/utils/extension/context_extension.dart';
@@ -19,6 +21,7 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:http/http.dart' as http;
 
 @RoutePage(name: 'ListRoute')
 class ShopingListPage extends StatefulWidget {
@@ -32,14 +35,14 @@ class _ShopingListPageState extends State<ShopingListPage> {
   final ScrollController _firstController = ScrollController();
   final TextEditingController _textController = TextEditingController();
   final TextEditingController _topTextController = TextEditingController();
+
+  final TextEditingController _listNameController = TextEditingController();
   int textIndex = 0;
-  ListModel textResult = ListModel(name: "", result: Result(list: []));
-  late List<String> shopLista;
+  ListModel textResult = ListModel(name: "", result: []);
   bool sizeBool = true;
 
   @override
   void initState() {
-    shopLista = <String>[];
     _topTextController.addListener(() {});
     super.initState();
   }
@@ -52,25 +55,25 @@ class _ShopingListPageState extends State<ShopingListPage> {
         child: appBar(context),
       ),
       backgroundColor: context.colorScheme.background,
-      body: Center(child: bodyPage(context, shopLista)),
+      body: Center(child: bodyPage(context)),
     );
   }
 
-  SingleChildScrollView bodyPage(BuildContext context, List<String> shopList) {
+  SingleChildScrollView bodyPage(BuildContext context) {
     return SingleChildScrollView(
       physics: BouncingScrollPhysics(), //NeverScrollableScrollPhysics(),
       child: Container(
         width: context.width,
-        height: context.height,
+        //height: context.height,
         padding: context.padding2,
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            leftSide(context, shopList),
+            leftSide(context),
             SizedBox(
               width: 10.w,
             ),
-            rightSide(context),
+            Expanded(child: rightSide(context)),
           ],
         ),
       ),
@@ -81,7 +84,7 @@ class _ShopingListPageState extends State<ShopingListPage> {
   Widget rightSide(BuildContext context) {
     return Container(
       width: 230.w,
-      height: 500.h,
+      height: 580.h,
       decoration: BoxDecoration(
         color: context.colorScheme.onSurface,
         borderRadius: BorderRadius.circular(4),
@@ -94,9 +97,9 @@ class _ShopingListPageState extends State<ShopingListPage> {
             topSearchField(context),
             divider(context),
             searchBarOpenStateTopContainer(context),
-            //     Visibility(visible: !sizeBool, child: divider(context)),
-            //shopListContainer(context),
-            const Spacer(),
+            Visibility(visible: !sizeBool, child: divider(context)),
+            shopListContainer(context),
+            //const Spacer(),
             bottomSearchField(context),
           ],
         ),
@@ -105,67 +108,67 @@ class _ShopingListPageState extends State<ShopingListPage> {
   }
 
   Widget bottomSearchField(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Icon(
-          Icons.camera_alt_outlined,
-          color: context.colorScheme.onPrimary,
-        ),
-        Container(
-          height: 30.h,
-          width: 180.w,
-          child: TextFormField(
-            textAlign: TextAlign.left,
-            controller: _textController,
-            style: context.textTheme.bodyLarge,
-            cursorHeight: 14.h,
-            decoration: InputDecoration(
-              contentPadding: context.leftPadding2,
-              hintText:
-                  "${LocaleKeys.shopping_list_page_what_do_you_whant.tr()}",
-              hintStyle: context.textTheme.titleMedium!
-                  .copyWith(color: context.colorScheme.onPrimary),
-              filled: true,
-              fillColor: context.colorScheme.background,
-              suffixIcon: Padding(
-                padding: context.leftPadding1,
-                child: BlocBuilder<ShoppingListViewCubit, ShoppingListView>(
-                  builder: (context, state) {
-                    return GestureDetector(
-                      onTap: () {
-                        if (state is ShoppingListViewEvent) {
-                          BlocProvider.of<ShoppingListViewCubit>(context)
-                              .addTextItem(
-                                  textIndex, textResult, _textController.text);
-                          _textController.clear();
-                        }
-                      },
-                      child: Icon(
-                        Icons.send,
-                        color: context.colorScheme.onPrimary,
-                      ),
-                    );
-                  },
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 10.w),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Icon(
+            Icons.camera_alt_outlined,
+            color: context.colorScheme.onPrimary,
+          ),
+          Container(
+            height: 30.h,
+            width: 180.w,
+            child: TextFormField(
+              textAlign: TextAlign.left,
+              controller: _textController,
+              style: context.textTheme.bodyLarge,
+              cursorHeight: 14.h,
+              decoration: InputDecoration(
+                contentPadding: context.leftPadding2,
+                hintText: "${LocaleKeys.shopping_list_page_what_do_you_whant.tr()}",
+                hintStyle: context.textTheme.titleMedium!.copyWith(color: context.colorScheme.onPrimary),
+                filled: true,
+                fillColor: context.colorScheme.background,
+                suffixIcon: Padding(
+                  padding: context.leftPadding1,
+                  child: BlocBuilder<ShoppingListViewCubit, ShoppingListView>(
+                    builder: (context, state) {
+                      return GestureDetector(
+                        onTap: () {
+                          if (state is ShoppingListViewEvent) {
+                            BlocProvider.of<ShoppingListViewCubit>(context)
+                                .addTextItem(textIndex, textResult, _textController.text);
+                            _textController.clear();
+                          }
+                        },
+                        child: Icon(
+                          Icons.send,
+                          color: context.colorScheme.onPrimary,
+                        ),
+                      );
+                    },
+                  ),
                 ),
-              ),
-              border: OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.amber),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(14),
-                borderSide: BorderSide(
-                  color: context.colorScheme.onTertiary,
+                border: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.amber),
                 ),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(14),
-                borderSide: BorderSide(color: context.colorScheme.onTertiary),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: BorderSide(
+                    color: context.colorScheme.onTertiary,
+                  ),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: BorderSide(color: context.colorScheme.onTertiary),
+                ),
               ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -177,6 +180,13 @@ class _ShopingListPageState extends State<ShopingListPage> {
         child: TextFormField(
           controller: _topTextController,
           textAlign: TextAlign.left,
+          onChanged: (value) {
+            if (value.length > 2) {
+              BlocProvider.of<SearchListViewCubit>(context).getList(_topTextController.text);
+            } else {
+              BlocProvider.of<SearchListViewCubit>(context).emptyList();
+            }
+          },
           style: context.textTheme.bodyLarge,
           cursorHeight: 14.h,
           onTap: () {
@@ -193,8 +203,7 @@ class _ShopingListPageState extends State<ShopingListPage> {
           decoration: InputDecoration(
             contentPadding: context.leftPadding2,
             hintText: "${LocaleKeys.shopping_list_page_search_item.tr()}",
-            hintStyle: context.textTheme.titleMedium!
-                .copyWith(color: context.colorScheme.onPrimary),
+            hintStyle: context.textTheme.titleMedium!.copyWith(color: context.colorScheme.onPrimary),
             filled: true,
             fillColor: context.colorScheme.background,
             suffixIcon: Padding(
@@ -223,78 +232,71 @@ class _ShopingListPageState extends State<ShopingListPage> {
     );
   }
 
-  Padding shopListContainer(BuildContext context) {
-    return Padding(
-      padding: context.paddingHorizontal2,
-      child: Container(
-        width: double.maxFinite,
-        height: sizeBool == true ? context.height - 350.h : 300.h,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            BlocBuilder<ShoppingListViewCubit, ShoppingListView>(
-                builder: (BuildContext context, state) {
-              if (state is ShoppingListViewEventInitial) {
+  shopListContainer(BuildContext context) {
+    return Expanded(
+      child: Padding(
+        padding: EdgeInsets.only(bottom: context.value2, left: context.value2, right: context.value2),
+        child: Container(
+          width: double.maxFinite,
+          //height: sizeBool == true ? context.height - 210.h : 197.h,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              BlocBuilder<ShoppingListViewCubit, ShoppingListView>(builder: (BuildContext context, state) {
+                if (state is ShoppingListViewEventInitial) {
+                  return Text("");
+                } else if (state is ShoppingListViewEvent) {
+                  return Text(
+                    state.shopList.name,
+                    style: context.textTheme.titleMedium!.copyWith(color: context.colorScheme.onPrimary),
+                  );
+                }
                 return Text("");
-              } else if (state is ShoppingListViewEvent) {
-                return Text(
-                  state.shopList.name,
-                  style: context.textTheme.titleMedium!
-                      .copyWith(color: context.colorScheme.onPrimary),
-                );
-              }
-              return Text("");
-            }),
-            Container(
-              child: BlocBuilder<ShoppingListViewCubit, ShoppingListView>(
+              }),
+              BlocBuilder<ShoppingListViewCubit, ShoppingListView>(
                 builder: (BuildContext context, state) {
                   if (state is ShoppingListViewEventInitial) {
                     return Center(
                       child: Text(
                         "Liste Seç",
-                        style: context.textTheme.titleMedium!
-                            .copyWith(color: context.colorScheme.onPrimary),
+                        style: context.textTheme.titleMedium!.copyWith(color: context.colorScheme.onPrimary),
                       ),
                     );
                   } else if (state is ShoppingListViewEvent) {
-                    if (state.shopList.result.list.isEmpty) {
+                    if (state.shopList.result.isEmpty) {
                       return Center(
                           child: Text(
                         "Bu Liste Boş",
-                        style: context.textTheme.titleMedium!
-                            .copyWith(color: context.colorScheme.onPrimary),
+                        style: context.textTheme.titleMedium!.copyWith(color: context.colorScheme.onPrimary),
                       ));
                     }
-                    return ListView.builder(
-                      padding: EdgeInsets.zero,
-                      shrinkWrap: true,
-                      itemCount: state.shopList.result.list.length + 1,
-                      itemBuilder: (context, index) {
-                        if (index == state.shopList.result.list.length ||
-                            state.shopList.result.list.isEmpty) {
-                          return null;
-                        } else if (state.shopList.result.list[index]
-                            is TextItem) {
-                          var a = state.shopList.result.list[index] as TextItem;
-                          return itemWithoutImage(context, a.text);
-                        } else if (state.shopList.result.list[index]
-                            is ImageItem) {
-                          var a =
-                              state.shopList.result.list[index] as ImageItem;
-                          return itemWithImage(context, false, a.text,
-                              a.bottomText, a.adet, index);
-                        }
+                    return Expanded(
+                      child: ListView.builder(
+                        padding: EdgeInsets.zero,
+                        shrinkWrap: true,
+                        itemCount: state.shopList.result.length + 1,
+                        itemBuilder: (context, index) {
+                          if (index == state.shopList.result.length || state.shopList.result.isEmpty) {
+                            return null;
+                          } else if (state.shopList.result[index] is TextItem) {
+                            var a = state.shopList.result[index] as TextItem;
+                            return itemWithoutImage(index, context, a.text);
+                          } else if (state.shopList.result[index] is ImageItem) {
+                            var a = state.shopList.result[index] as ImageItem;
+                            return itemWithImage(context, false, a.text, a.bottomText, a.adet, index, a.imageUrl);
+                          }
 
-                        return null;
-                      },
+                          return null;
+                        },
+                      ),
                     );
                   } else {
                     return Text("bir Hata oluştu");
                   }
                 },
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -308,7 +310,6 @@ class _ShopingListPageState extends State<ShopingListPage> {
           child: Container(
             width: double.maxFinite,
             height: context.height - 485.h,
-            //height: context.height - 604.20 - 6 + context.value1 + 35,
             child: Container(
               width: double.maxFinite,
               child: Column(
@@ -316,27 +317,31 @@ class _ShopingListPageState extends State<ShopingListPage> {
                 children: [
                   Text(
                     "${LocaleKeys.shopping_list_page_most_used.tr()}",
-                    style: context.textTheme.titleMedium!
-                        .copyWith(color: context.colorScheme.onPrimary),
+                    style: context.textTheme.titleMedium!.copyWith(color: context.colorScheme.onPrimary),
                   ),
-                  Container(
-                      width: 250.w,
-                      child: itemWithImage(context, true, "Lays",
-                          "Lays 150g Yoğurt ve Mevsim Yeşillikli", 2, 1)),
                   divider(context),
                   Expanded(
                     child: Container(
-                      child: ListView(children: [
-                        itemWithImage(context, true, "Lays",
-                            "Lays 150g Yoğurt ve Mevsim Yeşillikli", 2, 1),
-                        itemWithImage(context, true, "İçim",
-                            "İçim Süzme Beyaz Peynir ", 2, 1),
-                        itemWithImage(context, true, "Doritos",
-                            "Doritos 150g Acı ve Baharatlı", 2, 1),
-                        itemWithImage(context, true, "Namet",
-                            "150g Çemensiz Pastırma", 2, 1),
-                      ]),
-                    ),
+                        child: BlocBuilder<SearchListViewCubit, SearchListView>(builder: (BuildContext context, state) {
+                      if (state is SearchListViewInitial) {
+                        return Center(
+                            child: Text(
+                          "Arama Yapmak için 3 harf yada fazlasını giriniz",
+                          textAlign: TextAlign.center,
+                          style: context.textTheme.titleMedium!.copyWith(color: context.colorScheme.onPrimary),
+                        ));
+                      } else if (state is SearchListViewOnItemCame) {
+                        return ListView.builder(
+                          itemCount: state.list.length,
+                          itemBuilder: (context, index) {
+                            return itemWithImage(context, true, state.list.elementAt(index).productName.toString(), "",
+                                index, index, state.list.elementAt(index).productImages!.elementAt(0).toString());
+                          },
+                        );
+                      } else {
+                        return Text("Ürün Yok");
+                      }
+                    })),
                   ),
                 ],
               ),
@@ -346,6 +351,7 @@ class _ShopingListPageState extends State<ShopingListPage> {
   }
 
   Padding itemWithoutImage(
+    int index,
     BuildContext context,
     String text,
   ) {
@@ -353,30 +359,43 @@ class _ShopingListPageState extends State<ShopingListPage> {
       padding: context.topPadding1,
       child: Container(
         width: 200.w,
-        decoration: BoxDecoration(
-            color: context.colorScheme.background,
-            borderRadius: BorderRadius.circular(4)),
+        decoration: BoxDecoration(color: context.colorScheme.background, borderRadius: BorderRadius.circular(4)),
         child: Padding(
           padding: context.padding1,
-          child: Text(
-            text, //"Dinozor şeklinde olan kek kalıplarından 5 tane Dinozor şeklinde olan kek kalıplarından 5 tane",
-            style: context.textTheme.bodyLarge,
+          child: Row(
+            children: [
+              Container(
+                width: context.width / 2.3,
+                child: Text(
+                  text,
+                  style: context.textTheme.bodyLarge,
+                ),
+              ),
+              Spacer(),
+              GestureDetector(
+                onTap: () {
+                  BlocProvider.of<ShoppingListViewCubit>(context).deleteTextItem(index, textResult);
+                },
+                child: Icon(
+                  Icons.delete,
+                  color: context.colorScheme.error,
+                ),
+              ),
+            ],
           ),
         ),
       ),
     );
   }
 
-  Padding itemWithImage(BuildContext context, bool searchBool, String marka,
-      String bottomText, int count, int index) {
+  Padding itemWithImage(
+      BuildContext context, bool searchBool, String marka, String bottomText, int count, int index, String image) {
     return Padding(
       padding: context.topPadding1,
       child: Container(
         width: 200.w,
         height: 50.h,
-        decoration: BoxDecoration(
-            color: context.colorScheme.background,
-            borderRadius: BorderRadius.circular(4)),
+        decoration: BoxDecoration(color: context.colorScheme.background, borderRadius: BorderRadius.circular(4)),
         child: Row(
           children: [
             Padding(
@@ -384,9 +403,8 @@ class _ShopingListPageState extends State<ShopingListPage> {
               child: Container(
                 width: 40.w,
                 height: 50.h,
-                decoration: BoxDecoration(
-                    color: context.colorScheme.onPrimary,
-                    borderRadius: BorderRadius.circular(4)),
+                decoration: BoxDecoration(color: context.colorScheme.onPrimary, borderRadius: BorderRadius.circular(4)),
+                child: Image.network(image, fit: BoxFit.cover),
               ),
             ),
             Padding(
@@ -401,12 +419,6 @@ class _ShopingListPageState extends State<ShopingListPage> {
                       overflow: TextOverflow.ellipsis,
                       style: context.textTheme.labelSmall,
                     ),
-                    Text(
-                      bottomText,
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 2,
-                      style: context.textTheme.labelSmall,
-                    )
                   ],
                 ),
               ),
@@ -421,19 +433,15 @@ class _ShopingListPageState extends State<ShopingListPage> {
                         GestureDetector(
                           onTap: () {
                             textResult.name != ""
-                                ? BlocProvider.of<ShoppingListViewCubit>(
-                                        context)
-                                    .addImageItem(
-                                        1, textResult, marka, bottomText)
+                                ? BlocProvider.of<ShoppingListViewCubit>(context)
+                                    .addImageItem(1, textResult, marka, bottomText, image)
                                 : null;
                           },
                           child: Container(
                             alignment: Alignment.center,
                             width: 18.w,
                             height: 18.h,
-                            decoration: BoxDecoration(
-                                color: context.colorScheme.onTertiary,
-                                shape: BoxShape.circle),
+                            decoration: BoxDecoration(color: context.colorScheme.onTertiary, shape: BoxShape.circle),
                             child: Text(
                               "+",
                               textAlign: TextAlign.center,
@@ -444,7 +452,7 @@ class _ShopingListPageState extends State<ShopingListPage> {
                         SizedBox(
                           height: 4.h,
                         ),
-                        Container(
+                        /*Container(
                           alignment: Alignment.center,
                           width: 18.w,
                           height: 18.h,
@@ -461,7 +469,7 @@ class _ShopingListPageState extends State<ShopingListPage> {
                               color: context.colorScheme.onTertiary,
                             ),
                           ),
-                        )
+                        )*/
                       ],
                     )
                   : Column(
@@ -472,16 +480,14 @@ class _ShopingListPageState extends State<ShopingListPage> {
                           children: [
                             GestureDetector(
                               onTap: () {
-                                BlocProvider.of<ShoppingListViewCubit>(context)
-                                    .incrementItem(index, textResult);
+                                BlocProvider.of<ShoppingListViewCubit>(context).incrementItem(index, textResult);
                               },
                               child: Container(
                                 alignment: Alignment.center,
                                 width: 18.w,
                                 height: 18.h,
-                                decoration: BoxDecoration(
-                                    color: context.colorScheme.onTertiary,
-                                    shape: BoxShape.circle),
+                                decoration:
+                                    BoxDecoration(color: context.colorScheme.onTertiary, shape: BoxShape.circle),
                                 child: Text(
                                   "+",
                                   textAlign: TextAlign.center,
@@ -494,8 +500,7 @@ class _ShopingListPageState extends State<ShopingListPage> {
                             ),
                             GestureDetector(
                               onTap: () {
-                                BlocProvider.of<ShoppingListViewCubit>(context)
-                                    .decrementItem(index, textResult);
+                                BlocProvider.of<ShoppingListViewCubit>(context).decrementItem(index, textResult);
                               },
                               child: Container(
                                 alignment: Alignment.center,
@@ -510,8 +515,7 @@ class _ShopingListPageState extends State<ShopingListPage> {
                                 child: Text(
                                   "-",
                                   textAlign: TextAlign.center,
-                                  style:
-                                      context.textTheme.headlineSmall!.copyWith(
+                                  style: context.textTheme.headlineSmall!.copyWith(
                                     color: context.colorScheme.onTertiary,
                                   ),
                                 ),
@@ -548,21 +552,19 @@ class _ShopingListPageState extends State<ShopingListPage> {
 
   //Left Side Component
   //Yeni liste Ekleme işlemi burada
-  Column leftSide(BuildContext context, List<String> shopList) {
+  Column leftSide(BuildContext context) {
     return Column(
       children: [
         Container(
           height: 500.h,
           width: 80.w,
-          decoration: BoxDecoration(
-              color: context.colorScheme.onSurface,
-              borderRadius: BorderRadius.circular(4)),
+          decoration: BoxDecoration(color: context.colorScheme.onSurface, borderRadius: BorderRadius.circular(4)),
           child: Padding(
             padding: context.paddingHorizontal1,
             child: Column(children: [
               Container(
                 width: 80.w,
-                height: 420.h,
+                height: 410.h,
                 child: RawScrollbar(
                   crossAxisMargin: -context.value2,
                   thickness: 5,
@@ -571,31 +573,81 @@ class _ShopingListPageState extends State<ShopingListPage> {
                   interactive: true,
                   thumbColor: context.colorScheme.onTertiary,
                   radius: Radius.circular(4),
-                  child: BlocBuilder<ShoppingListAddCubit,
-                      ShoppingListChangeEvent>(
-                    builder:
-                        (BuildContext context, ShoppingListChangeEvent state) {
+                  child: BlocBuilder<ShoppingListAddCubit, ShoppingListChangeEvent>(
+                    builder: (BuildContext context, ShoppingListChangeEvent state) {
                       return ListView.builder(
                         padding: EdgeInsets.zero,
                         controller: _firstController,
                         itemCount: state.shopList.length + 1,
                         itemBuilder: (BuildContext context, int index) {
-                          if (index == state.shopList.length ||
-                              state.shopList.isEmpty) {
+                          if (index == state.shopList.length || state.shopList.isEmpty) {
                             return GestureDetector(
                                 onTap: () {
-                                  BlocProvider.of<ShoppingListAddCubit>(context)
-                                      .addShoppingList(ListModel(
-                                          name: "Liste $index",
-                                          result: Result(list: [])));
+                                  showLoaderDialog(BuildContext context) {
+                                    AlertDialog alert = AlertDialog(
+                                      backgroundColor: Colors.transparent,
+                                      elevation: 0,
+                                      content: Container(
+                                        width: context.width,
+                                        height: context.height,
+                                        child: Center(
+                                          child: Column(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              //CircularProgressIndicator(color: context.colorScheme.onPrimary),
+                                              Container(
+                                                  alignment: Alignment.centerLeft,
+                                                  margin: EdgeInsets.only(left: 7),
+                                                  child: Text(
+                                                    "Listeye isim giriniz..",
+                                                    textAlign: TextAlign.center,
+                                                    style: context.textTheme.titleLarge!
+                                                        .copyWith(color: context.colorScheme.onPrimary),
+                                                  )),
+                                              Padding(
+                                                padding: const EdgeInsets.only(top: 8.0),
+                                                child: TextField(controller: _listNameController),
+                                              ),
+                                              Padding(
+                                                padding: const EdgeInsets.only(top: 8.0),
+                                                child: ElevatedButton.icon(
+                                                  style: ElevatedButton.styleFrom(
+                                                      backgroundColor: context.colorScheme.onPrimary),
+                                                  onPressed: () {
+                                                    BlocProvider.of<ShoppingListAddCubit>(context).addShoppingList(
+                                                        ListModel(name: _listNameController.text, result: []));
+                                                    Navigator.pop(context);
+                                                  },
+                                                  icon: Icon(
+                                                    Icons.verified,
+                                                    color: context.colorScheme.onSurface,
+                                                  ),
+                                                  label: Text(
+                                                    "Onayla",
+                                                    style: context.textTheme.labelMedium,
+                                                  ),
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                    showDialog(
+                                      barrierDismissible: false,
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return alert;
+                                      },
+                                    );
+                                  }
+
+                                  showLoaderDialog(context);
                                 },
                                 child: addShopListContainer(context));
                           }
                           return shopListNameContainer(
-                              context,
-                              state.shopList[index].name,
-                              index,
-                              state.shopList[index]);
+                              context, state.shopList[index].name, index, state.shopList[index]);
                         },
                       );
                     },
@@ -606,7 +658,7 @@ class _ShopingListPageState extends State<ShopingListPage> {
           ),
         ),
         SizedBox(
-          height: context.value2,
+          height: context.value1,
         ),
         shareButton(context),
       ],
@@ -621,44 +673,42 @@ class _ShopingListPageState extends State<ShopingListPage> {
         width: double.maxFinite,
         alignment: Alignment.center,
         height: 60.h,
-        decoration: BoxDecoration(
-            color: context.colorScheme.background,
-            borderRadius: BorderRadius.all(Radius.circular(4))),
+        decoration:
+            BoxDecoration(color: context.colorScheme.background, borderRadius: BorderRadius.all(Radius.circular(4))),
         child: Text("+",
             overflow: TextOverflow.ellipsis,
             maxLines: 2,
             textAlign: TextAlign.center,
-            style: context.textTheme.displayLarge!
-                .copyWith(color: context.colorScheme.onPrimary)),
+            style: context.textTheme.displayLarge!.copyWith(color: context.colorScheme.onPrimary)),
       ),
     );
   }
 
   //liste getirme ve o listeyi silme işlemleri burada
-  Padding shopListNameContainer(
-      BuildContext context, String name, int index, ListModel result) {
+  Padding shopListNameContainer(BuildContext context, String name, int index, ListModel result) {
     return Padding(
       padding: context.topPadding1,
       child: GestureDetector(
         onTap: () {
-          textIndex = index;
-          textResult = result;
+          setState(() {
+            textIndex = index;
+            textResult = result;
+          });
+
           _textController.clear();
           BlocProvider.of<ShoppingListViewCubit>(context).getList(result);
         },
         onLongPress: () {
-          textResult = ListModel(name: "", result: Result(list: []));
-          BlocProvider.of<ShoppingListAddCubit>(context)
-              .deleteShoppingList(index, context);
+          textResult = ListModel(name: "", result: []);
+          BlocProvider.of<ShoppingListAddCubit>(context).deleteShoppingList(index, context);
         },
         child: Container(
           padding: context.padding1,
           width: double.maxFinite,
           alignment: Alignment.center,
           height: 60.h,
-          decoration: BoxDecoration(
-              color: context.colorScheme.background,
-              borderRadius: BorderRadius.all(Radius.circular(4))),
+          decoration:
+              BoxDecoration(color: context.colorScheme.background, borderRadius: BorderRadius.all(Radius.circular(4))),
           child: Text(name,
               overflow: TextOverflow.ellipsis,
               maxLines: 2,
@@ -670,9 +720,76 @@ class _ShopingListPageState extends State<ShopingListPage> {
   }
 
   Container shareButton(BuildContext context) {
+    var box = Hive.box("GlobalList");
+    var repo = box.get(0) as Repo;
+    List<pw.Image> imageList = [];
+    var imageIndex = -1;
+    ListModel list;
+    list = ListModel(name: "", result: []);
+    try {
+      if (repo.list.isNotEmpty) {
+        print("object share" + textIndex.toString());
+        list = repo.list.elementAt(textIndex);
+      } else {
+        list = ListModel(name: "name", result: []);
+      }
+    } catch (e) {
+      print(e);
+    }
+
+    showLoaderDialog(BuildContext context) {
+      AlertDialog alert = AlertDialog(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        content: Container(
+          width: context.width,
+          height: context.height,
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                CircularProgressIndicator(color: context.colorScheme.onPrimary),
+                Container(
+                    margin: EdgeInsets.only(left: 7),
+                    child: Text(
+                      "PDF oluşturuluyor lütfen bekleyin...",
+                      textAlign: TextAlign.center,
+                      style: context.textTheme.titleLarge!.copyWith(color: context.colorScheme.onPrimary),
+                    )),
+              ],
+            ),
+          ),
+        ),
+      );
+      showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext context) {
+          return alert;
+        },
+      );
+    }
+
+    Future<void> getWidget(int index) async {
+      var imageurl = list.result.elementAt(index).imageUrl.toString();
+      final response = await http.get(Uri.parse(imageurl));
+      final bytes = response.bodyBytes;
+
+      final directory = await getTemporaryDirectory();
+
+      final directoryPath = "${directory.path}/Wingoo";
+
+      if (!await Directory(directoryPath).exists()) {
+        await Directory(directoryPath).create(recursive: true);
+      }
+      final imageFile = File('${directoryPath}/image_$index.jpg');
+      await imageFile.writeAsBytes(bytes);
+      imageList.add(pw.Image(pw.MemoryImage(imageFile.readAsBytesSync()), fit: pw.BoxFit.cover));
+    }
+
     return Container(
       padding: context.padding1,
-      height: 80.h,
+      height: 74.h,
       width: 80.w,
       alignment: Alignment.center,
       decoration: BoxDecoration(
@@ -685,9 +802,17 @@ class _ShopingListPageState extends State<ShopingListPage> {
       child: Builder(builder: (context) {
         return GestureDetector(
           onTap: () async {
+            showLoaderDialog(context);
+            imageList.clear();
+            imageIndex = -1;
+            for (var i = 0; i < list.result.length; i++) {
+              if (list.result.elementAt(i) is ImageItem) {
+                await getWidget(i);
+              }
+            }
+            print(" length " + imageList.length.toString());
             final pdf = pw.Document();
-            final font = pw.Font.ttf(
-                await rootBundle.load("assets/fonts/Roboto-Regular.ttf"));
+            final font = pw.Font.ttf(await rootBundle.load("assets/fonts/Roboto-Regular.ttf"));
 
             pdf.addPage(
               pw.MultiPage(
@@ -705,9 +830,7 @@ class _ShopingListPageState extends State<ShopingListPage> {
                 },
                 pageTheme: pw.PageTheme(
                   buildBackground: (context) {
-                    return pw.FullPage(
-                        ignoreMargins: true,
-                        child: pw.Container(color: PdfColor.fromHex("282828")));
+                    return pw.FullPage(ignoreMargins: true, child: pw.Container(color: PdfColor.fromHex("282828")));
                   },
                 ),
                 build: (pw.Context context) {
@@ -716,7 +839,7 @@ class _ShopingListPageState extends State<ShopingListPage> {
                       crossAxisAlignment: pw.CrossAxisAlignment.end,
                       children: [
                         pw.Text(
-                          "Piknik için listem",
+                          list.name,
                           style: pw.TextStyle(
                             fontSize: 25,
                             font: font,
@@ -727,104 +850,84 @@ class _ShopingListPageState extends State<ShopingListPage> {
                       ],
                     ),
                     pw.ListView.builder(
-                        itemBuilder: (context, index) {
-                          if (index < 5) {
-                            return pw.Padding(
-                              padding:
-                                  pw.EdgeInsets.only(top: this.context.value1),
-                              child: pw.Container(
-                                decoration: pw.BoxDecoration(
-                                    color: PdfColor.fromHex("494949"),
-                                    borderRadius: pw.BorderRadius.circular(4)),
-                                child: pw.Row(
-                                  crossAxisAlignment:
-                                      pw.CrossAxisAlignment.start,
-                                  children: [
-                                    pw.Padding(
-                                      padding: pw.EdgeInsets.all(
-                                          this.context.value1),
-                                      child: pw.Container(
+                      itemCount: list.result.length,
+                      itemBuilder: (context, index) {
+                        if (list.result.elementAt(index) is ImageItem) {
+                          imageIndex = imageIndex + 1;
+                          return pw.Padding(
+                            padding: pw.EdgeInsets.only(top: this.context.value1),
+                            child: pw.Container(
+                              decoration: pw.BoxDecoration(
+                                  color: PdfColor.fromHex("494949"), borderRadius: pw.BorderRadius.circular(4)),
+                              child: pw.Row(
+                                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                                children: [
+                                  pw.Padding(
+                                    padding: pw.EdgeInsets.all(this.context.value1),
+                                    child: pw.Container(
                                         width: 60,
                                         height: 60,
                                         decoration: pw.BoxDecoration(
-                                            color: PdfColors.white,
-                                            borderRadius:
-                                                pw.BorderRadius.circular(4)),
-                                      ),
-                                    ),
-                                    pw.Padding(
-                                      padding: pw.EdgeInsets.only(
-                                          top: this.context.value1,
-                                          bottom: this.context.value1),
-                                      child: pw.Container(
-                                        width: 380,
-                                        child: pw.Column(
-                                          crossAxisAlignment:
-                                              pw.CrossAxisAlignment.start,
-                                          children: [
-                                            pw.Row(children: [
-                                              pw.Text(
-                                                "Lays",
-                                                style: pw.TextStyle(
-                                                  fontSize: 14,
-                                                  font: font,
-                                                  fontWeight:
-                                                      pw.FontWeight.bold,
-                                                  color: PdfColors.white,
-                                                ),
-                                              ),
-                                              pw.Text(
-                                                " - 10 Adet",
-                                                style: pw.TextStyle(
-                                                  fontSize: 14,
-                                                  font: font,
-                                                  fontWeight:
-                                                      pw.FontWeight.bold,
-                                                  color: PdfColors.green300,
-                                                ),
-                                              ),
-                                            ]),
+                                            color: PdfColors.white, borderRadius: pw.BorderRadius.circular(4)),
+                                        child: imageList[imageIndex]),
+                                  ),
+                                  pw.Padding(
+                                    padding: pw.EdgeInsets.only(top: this.context.value1, bottom: this.context.value1),
+                                    child: pw.Container(
+                                      width: 380,
+                                      child: pw.Column(
+                                        crossAxisAlignment: pw.CrossAxisAlignment.start,
+                                        children: [
+                                          pw.Row(children: [
                                             pw.Text(
-                                              "Lay's Fırından Yoğurt Mevsim Yeşillikleri Patates Cipsi Süper Boy 96 gr",
+                                              list.result.elementAt(index).text,
                                               style: pw.TextStyle(
                                                 fontSize: 14,
                                                 font: font,
                                                 fontWeight: pw.FontWeight.bold,
                                                 color: PdfColors.white,
                                               ),
-                                            )
-                                          ],
-                                        ),
+                                            ),
+                                            pw.Text(
+                                              " - " + list.result.elementAt(index).adet.toString() + "adet",
+                                              style: pw.TextStyle(
+                                                fontSize: 14,
+                                                font: font,
+                                                fontWeight: pw.FontWeight.bold,
+                                                color: PdfColors.green300,
+                                              ),
+                                            ),
+                                          ]),
+                                        ],
                                       ),
                                     ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          } else {
-                            return pw.Padding(
-                              padding:
-                                  pw.EdgeInsets.only(top: this.context.value1),
-                              child: pw.Container(
-                                width: 5000.w,
-                                padding: pw.EdgeInsets.all(this.context.value1),
-                                decoration: pw.BoxDecoration(
-                                    color: PdfColor.fromHex("494949"),
-                                    borderRadius: pw.BorderRadius.circular(4)),
-                                child: pw.Text(
-                                  "Dinozor şeklinde olan kek kalıplarından 5 tane Dinozor şeklinde olan kek kalıplarından 5 tane",
-                                  style: pw.TextStyle(
-                                    fontSize: 14,
-                                    font: font,
-                                    fontWeight: pw.FontWeight.bold,
-                                    color: PdfColors.white,
                                   ),
+                                ],
+                              ),
+                            ),
+                          );
+                        } else {
+                          return pw.Padding(
+                            padding: pw.EdgeInsets.only(top: this.context.value1),
+                            child: pw.Container(
+                              width: 5000.w,
+                              padding: pw.EdgeInsets.all(this.context.value1),
+                              decoration: pw.BoxDecoration(
+                                  color: PdfColor.fromHex("494949"), borderRadius: pw.BorderRadius.circular(4)),
+                              child: pw.Text(
+                                list.result.elementAt(index).text,
+                                style: pw.TextStyle(
+                                  fontSize: 14,
+                                  font: font,
+                                  fontWeight: pw.FontWeight.bold,
+                                  color: PdfColors.white,
                                 ),
                               ),
-                            );
-                          }
-                        },
-                        itemCount: 10),
+                            ),
+                          );
+                        }
+                      },
+                    ),
                   ];
                 },
               ),
@@ -843,13 +946,12 @@ class _ShopingListPageState extends State<ShopingListPage> {
 
             print("PDF dosyası cihaza kaydedildi: ${file.path}");
 
+            Navigator.pop(context);
             if (Platform.isIOS) {
               final box = context.findRenderObject() as RenderBox?;
 
-              final result = await Share.shareXFiles(
-                  [XFile('${directoryPath}/MyPdf.pdf')],
-                  sharePositionOrigin:
-                      box!.localToGlobal(Offset.zero) & box.size);
+              final result = await Share.shareXFiles([XFile('${directoryPath}/MyPdf.pdf')],
+                  sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size);
 
               if (result.status == ShareResultStatus.success) {
                 print('Send');
@@ -876,8 +978,7 @@ class _ShopingListPageState extends State<ShopingListPage> {
                   overflow: TextOverflow.ellipsis,
                   maxLines: 2,
                   textAlign: TextAlign.center,
-                  style: context.textTheme.labelSmall!
-                      .copyWith(color: context.colorScheme.onPrimary)),
+                  style: context.textTheme.labelSmall!.copyWith(color: context.colorScheme.onPrimary)),
             ],
           ),
         );

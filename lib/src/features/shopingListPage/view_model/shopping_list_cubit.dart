@@ -130,12 +130,37 @@ class SearchListViewCubit extends Cubit<SearchListView> {
   Future<List<FirebaseProductModel>> getFirestoreData(String text) async {
     List<FirebaseProductModel> modelList = [];
 
+    var locale_name = Platform.localeName;
+
+    var filterOption = "";
+
+    switch (locale_name) {
+      case "tr_TR":
+        filterOption = 'productName_tr';
+        break;
+      case "en_US":
+        filterOption = 'productName_en';
+        break;
+      case "de_DE":
+        filterOption = 'productName_de';
+        break;
+      case "fr_FR":
+        filterOption = 'productName_fra';
+        break;
+      case "nl_NL":
+        filterOption = 'productName_nl';
+        break;
+      default:
+        filterOption = 'productName_en';
+        break;
+    }
+
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
         .collection('products')
-        .where('productName_tr', isGreaterThanOrEqualTo: text)
-        .where('productName_tr', isLessThan: text + "z")
+        .where(filterOption, isGreaterThanOrEqualTo: text)
+        .where(filterOption, isLessThan: text + "z")
         .get();
-    var locale_name = Platform.localeName;
+
     String productName;
 
     querySnapshot.docs.forEach((doc) {

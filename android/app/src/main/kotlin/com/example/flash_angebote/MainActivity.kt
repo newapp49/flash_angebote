@@ -1,4 +1,4 @@
-package com.example.flash_angebote
+package com.nixar.wingo
 
 import io.flutter.embedding.android.FlutterActivity
 

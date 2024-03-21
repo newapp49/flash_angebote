@@ -55,28 +55,27 @@ class AppThemeLight extends AppTheme {
   /* Text Theme For The App */
 
   TextTheme get _textThemeLight => TextTheme(
-    
         displayLarge: TextStyle(
           fontSize: 35.sp,
           fontWeight: FontWeight.bold,
           letterSpacing: -0.5,
-          color: _colorSchemeLight.onBackground,
+          color: _colorSchemeLight.onPrimary,
         ),
         displayMedium: TextStyle(
           fontSize: 28.sp,
-          fontWeight: FontWeight.w400,
+          fontWeight: FontWeight.bold,
           letterSpacing: -0.5,
-          color: _colorSchemeLight.onBackground,
+          color: _colorSchemeLight.onPrimary,
         ),
         displaySmall: TextStyle(
           fontSize: 24.sp,
           fontWeight: FontWeight.w400,
-          color: _colorSchemeLight.onBackground,
+          color: _colorSchemeLight.onPrimary,
         ),
         headlineLarge: TextStyle(
           fontSize: 18.sp,
           fontWeight: FontWeight.w500,
-          color: _colorSchemeLight.onBackground,
+          color: _colorSchemeLight.onPrimary,
         ),
         headlineMedium: TextStyle(
           fontSize: 16.sp,

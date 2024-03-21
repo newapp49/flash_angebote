@@ -1,3 +1,3 @@
-# flash_angebote
+# wingo
 
 A new Flutter project.

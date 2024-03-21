@@ -1,28 +1,133 @@
-import 'dart:developer';
+import 'dart:math';
 
-import 'package:firebase_database/firebase_database.dart';
+import 'package:auto_route/auto_route.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flash_angebote/src/features/homepage/model/app_model.dart';
-import 'package:flash_angebote/src/features/homepage/model/company_model.dart';
-import 'package:flash_angebote/src/features/homepage/model/flyer_model.dart';
-import 'package:flash_angebote/src/features/homepage/view_model/homepage_state.dart';
+import 'package:wingo/core/init/manager/locale_manager.dart';
+import 'package:wingo/src/constants/location_constants.dart';
+import 'package:wingo/src/features/homepage/model/company_model.dart';
+import 'package:wingo/src/features/homepage/model/flyer_model.dart';
+import 'package:wingo/src/features/homepage/view_model/homepage_state.dart';
+import 'package:wingo/src/routing/app_router.dart';
+import 'package:wingo/src/shared/utils/enums/prefererences_keys.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
 
 class HomePageCubit extends Cubit<HomePageState> {
   HomePageCubit() : super(const HomePageInitial());
-  DatabaseReference dbReference = FirebaseDatabase.instance.ref('company');
-  List<CompanyModel?>? companyList = [];
-  List<FlyerModel?>? flyerList = [];
+  CollectionReference companyDB =
+      FirebaseFirestore.instance.collection('Users');
+  CollectionReference flyerDB =
+      FirebaseFirestore.instance.collection('flash_angebote_flyers');
 
-  Future<void> readCompanyData() async {
-    DataSnapshot? response = await dbReference.root.get();
-    response.value as ApplicationModel;
-    final value = ApplicationModel.fromJson(
-        Map<String, dynamic>.from(response.value! as Map<Object?, Object?>));
+  List<CompanyModel?>? companyList = [];
+  List<CompanyModel>? favouriteCompanyList = [];
+
+  List<FlyerModel?>? flyerList = [];
+  List<CompanyModel>? favouriteFlyerList = [];
+
+  Map<String, double> locationList = {};
+
+  late int maxDistanceFilter;
+
+  List<String> topsideFlyerUrls = [
+    "https://imgv3.fotor.com/images/share/Fotors-party-flyer-templates.jpg",
+    "https://www.befunky.com/images/wp/wp-2021-11-event-flyers-featured-image.jpg?auto=avif,webp&format=jpg&width=1136&crop=16:9",
+    "https://fiverr-res.cloudinary.com/images/t_main1,q_auto,f_auto,q_auto,f_auto/gigs/308749758/original/1dfbf2e0c1297b127e16504413bb5c4805b94f45/do-professional-flyers-invitations-and-posters-for-specific-theme-based-events.png",
+  ];
+
+  DateTime get todayDateTime => DateTime.now();
+  late Position locationData;
+  String getExpireDay(DateTime expireDate) {
+    Duration remainingDay = expireDate.difference(todayDateTime);
+    return remainingDay.inDays.toString();
   }
 
-  Future<Position> _determinePosition() async {
+  FlyerModel? findFavoriteFlyer(String companyId) {
+    for (var flyer in flyerList!) {
+      if (flyer!.companyId == companyId) {
+        return flyer;
+      }
+    }
+    return flyerList![0];
+  }
+
+  Future<void> setDistanceFilter() async {
+    if (LocaleManager.instance.getStringValue(PreferencesKeys.MAX_DISTANCE) ==
+        '') {
+      maxDistanceFilter = 1000;
+    } else {
+      maxDistanceFilter = int.parse(
+          LocaleManager.instance.getStringValue(PreferencesKeys.MAX_DISTANCE));
+    }
+  }
+
+  Future<void> readCompanyData() async {
+    companyList = [];
+    favouriteCompanyList = [];
+    await companyDB.get().then((value) {
+      for (var docSnapshot in value.docs) {
+        companyList!.add(
+            CompanyModel.fromJson(docSnapshot.data() as Map<String, dynamic>));
+      }
+    });
+    companyList!.sort((a, b) => a!.uid!.compareTo(b!.uid!));
+  }
+
+  Future<void> readFlyerData() async {
+    flyerList = [];
+    await flyerDB.get().then((value) {
+      for (var docSnapshot in value.docs) {
+        flyerList!.add(
+          FlyerModel.fromJson(docSnapshot.data() as Map<String, dynamic>),
+        );
+      }
+    });
+    flyerList!.sort((a, b) => a!.companyId!.compareTo(b!.companyId!));
+  }
+
+  void fillLocationList() {
+    double distance;
+    locationList = {};
+
+    for (var company in companyList!) {
+      distance = calculateDistance(company!.latitude!, company.longtitude!)
+          .roundToDouble();
+      if (distance <= maxDistanceFilter) {
+        locationList.addAll({company.uid!: distance});
+      }
+      if (company.isFavourite != null && company.isFavourite!) {
+        favouriteCompanyList!.add(company);
+      }
+    }
+  }
+
+  double calculateDistance(double hedefEnlem, double hedefBoylam) {
+    // Dünya'nın yarıçapı (ortalama olarak) - km cinsinden
+    const double dunyaYariCap = 6371.0;
+    double referansEnlem = locationData.latitude;
+    double referansBoylam = locationData.longitude;
+
+    // Derece cinsinden koordinat farklarını radyan cinsine çevir
+    double enlemFarki = _degreesToRadians(hedefEnlem - referansEnlem);
+    double boylamFarki = _degreesToRadians(hedefBoylam - referansBoylam);
+
+    // Haversine formülü kullanarak mesafeyi hesapla
+    double a = pow(sin(enlemFarki / 2), 2) +
+        cos(_degreesToRadians(referansEnlem)) *
+            cos(_degreesToRadians(hedefEnlem)) *
+            pow(sin(boylamFarki / 2), 2);
+    double c = 2 * atan2(sqrt(a), sqrt(1 - a));
+    double mesafe = dunyaYariCap * c;
+    return mesafe;
+  }
+
+  double _degreesToRadians(double degree) {
+    return degree * (pi / 180.0);
+  }
+
+  Future<void> _determinePosition() async {
     bool serviceEnabled;
     LocationPermission permission;
 
@@ -41,19 +146,35 @@ class HomePageCubit extends Cubit<HomePageState> {
     }
 
     if (permission == LocationPermission.deniedForever) {
-      // Permissions are denied forever, handle appropriately.
       return Future.error(
           'Location permissions are permanently denied, we cannot request permissions.');
     }
+    try {
+      if (LocaleManager.instance
+              .getStringValue(PreferencesKeys.CONSTANT_LOCATION) ==
+          '') {
+        locationData = await Geolocator.getCurrentPosition();
+      } else {
+        locationData = PositionConstants.positionConstants[LocaleManager
+            .instance
+            .getStringValue(PreferencesKeys.CONSTANT_LOCATION)]!;
+      }
+    } catch (e) {}
+  }
 
-    return await Geolocator.getCurrentPosition();
+  void navigateSettings(BuildContext context) {
+    context.router.push(SettingsRoute(callback: init));
   }
 
   Future<void> init() async {
     emit(const HomePageLoading());
     final fcmToken = await FirebaseMessaging.instance.getToken();
-    Position position = await _determinePosition();
-    inspect(position);
+    await _determinePosition();
+    await readCompanyData();
+    await readFlyerData();
+    await setDistanceFilter();
+    fillLocationList();
+    print(fcmToken);
     emit(const HomePageComplete());
   }
 }

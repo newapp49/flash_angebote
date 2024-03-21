@@ -1,5 +1,10 @@
-import 'package:flash_angebote/src/features/shopingListPage/model/list_model.dart';
+import 'package:hive/hive.dart';
+import 'package:wingo/src/features/shopingListPage/model/list_model.dart';
 
-class Repo {
-  List<ListModel> list = <ListModel>[] ;
+part 'repo.g.dart';
+
+@HiveType(typeId: 1)
+class Repo extends HiveObject {
+  @HiveField(0)
+  List<ListModel> list = <ListModel>[];
 }

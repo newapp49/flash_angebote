@@ -1,8 +1,8 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:flash_angebote/src/constants/image_constants.dart';
-import 'package:flash_angebote/src/features/splash/model/splash_state.dart';
-import 'package:flash_angebote/src/routing/app_router.dart';
-import 'package:flash_angebote/src/shared/utils/extension/context_extension.dart';
+import 'package:wingo/src/constants/image_constants.dart';
+import 'package:wingo/src/features/splash/model/splash_state.dart';
+import 'package:wingo/src/routing/app_router.dart';
+import 'package:wingo/src/shared/utils/extension/context_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';

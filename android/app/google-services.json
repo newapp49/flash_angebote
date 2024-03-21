@@ -62,6 +62,25 @@
           "other_platform_oauth_client": []
         }
       }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:926172492269:android:957cee317811c159cdb7e4",
+        "android_client_info": {
+          "package_name": "com.nixar.wingo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAOfH1pnLp88T0dJHYLAOb-5n9E-l9ioGI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
     }
   ],
   "configuration_version": "1"
